@@ -45,14 +45,15 @@ textarea { resize: vertical; min-height: 83px; margin: 12px 14px; width: calc(10
 #pdf-template {
   width: 210mm;
   min-height: 297mm;
-  padding: 14mm 14mm 12mm;
+  padding: 8mm;
   margin: 0 auto;
   background: #fff;
   color: #111;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 10.5px;
+  font-size: 11px;
   line-height: 1.5;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 /* Header row */
@@ -60,56 +61,70 @@ textarea { resize: vertical; min-height: 83px; margin: 12px 14px; width: calc(10
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 24px;
-  padding-bottom: 14px;
+  gap: 20px;
+  padding-bottom: 12px;
   border-bottom: 2.5px solid #1d7a63;
 }
-#pdf-template .pdf-company-wrap { flex: 1; }
+#pdf-template .pdf-header > * {
+  min-width: 0;
+  overflow: hidden;
+}
+#pdf-template .pdf-company-wrap {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
 #pdf-template .pdf-brand {
   display: flex;
   align-items: center;
-  gap: 11px;
-  font-size: 20px;
+  gap: 12px;
+  font-size: 22px;
   font-weight: 800;
   letter-spacing: .03em;
   color: #111;
 }
 #pdf-template .pdf-brand-mark {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   display: grid;
   place-items: center;
   color: #fff;
   background: #1d7a63;
-  font-size: 19px;
+  font-size: 21px;
   font-weight: 800;
   border-radius: 4px;
 }
-#pdf-template .pdf-brand > div { line-height: 1.2; }
+#pdf-template .pdf-brand > div { line-height: 1.25; }
 #pdf-template .pdf-brand small {
   display: block;
   margin-top: 2px;
-  font-size: 7.5px;
+  font-size: 8.5px;
   letter-spacing: .17em;
   color: #666;
   font-weight: 400;
 }
 #pdf-template .pdf-company {
-  margin-top: 9px;
+  margin-top: 10px;
   color: #444;
-  font-size: 9.5px;
-  line-height: 1.65;
+  font-size: 10px;
+  line-height: 1.7;
 }
 #pdf-template .pdf-quote {
-  min-width: 175px;
+  min-width: 0;
+  width: 165px;
+  flex-shrink: 0;
   display: grid;
   align-content: start;
   gap: 2px;
   text-align: right;
   color: #555;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 #pdf-template .pdf-quote-label {
-  font-size: 8.5px;
+  font-size: 9.5px;
   font-weight: 800;
   letter-spacing: .18em;
   color: #888;
@@ -117,11 +132,11 @@ textarea { resize: vertical; min-height: 83px; margin: 12px 14px; width: calc(10
 }
 #pdf-template .pdf-quote strong {
   color: #111;
-  font-size: 19px;
+  font-size: 21px;
   letter-spacing: -.02em;
   line-height: 1.1;
 }
-#pdf-template .pdf-quote span { font-size: 9px; margin-top: 2px; }
+#pdf-template .pdf-quote span { font-size: 10px; margin-top: 2px; }
 
 /* Title row */
 #pdf-template .pdf-title-row {
@@ -147,14 +162,14 @@ textarea { resize: vertical; min-height: 83px; margin: 12px 14px; width: calc(10
   box-sizing: border-box;
   border: 1px solid #d3dce2;
   border-radius: 2px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
   overflow: hidden;
 }
 #pdf-template .pdf-block-title {
-  padding: 6px 12px;
+  padding: 7px 14px;
   background: #1d7a63;
   color: #fff;
-  font-size: 8.5px;
+  font-size: 9px;
   font-weight: 800;
   letter-spacing: .1em;
   text-transform: uppercase;
@@ -164,13 +179,20 @@ textarea { resize: vertical; min-height: 83px; margin: 12px 14px; width: calc(10
   grid-template-columns: 1fr 1fr;
   gap: 0;
 }
-#pdf-template .pdf-info-grid > div { padding: 10px 13px 9px; }
+#pdf-template .pdf-info-grid > div {
+  padding: 10px 14px 9px;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
 #pdf-template .pdf-info-grid > div:first-child { border-right: 1px solid #d3dce2; }
-#pdf-template .pdf-info-grid p { margin: 4px 0; font-size: 10px; color: #333; overflow-wrap: break-word; word-break: break-word; }
+#pdf-template .pdf-info-grid p { margin: 4px 0; font-size: 10.5px; color: #333; overflow-wrap: anywhere; word-break: break-word; }
 #pdf-template .pdf-small-block p { margin: 3px 0; }
 #pdf-template .pdf-info-grid b {
   display: inline-block;
-  min-width: 74px;
+  min-width: 82px;
   color: #222;
   font-weight: 700;
 }
@@ -178,8 +200,10 @@ textarea { resize: vertical; min-height: 83px; margin: 12px 14px; width: calc(10
 /* Items table - matching reference layout */
 #pdf-template .pdf-table-ref {
   width: 100%;
+  max-width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
-  margin: 14px 0 18px;
+  margin: 12px 0 16px;
   font-size: 10px;
   border: 1px solid #d3dce2;
 }
@@ -187,9 +211,11 @@ textarea { resize: vertical; min-height: 83px; margin: 12px 14px; width: calc(10
 #pdf-template .pdf-table-ref th,
 #pdf-template .pdf-table-ref td {
   border: 1px solid #d3dce2;
-  padding: 8px 10px;
-  overflow-wrap: break-word;
+  padding: 7px 9px;
+  overflow: hidden;
+  overflow-wrap: anywhere;
   word-break: break-word;
+  white-space: normal;
 }
 
 #pdf-template .pdf-table-ref th {
@@ -198,88 +224,79 @@ textarea { resize: vertical; min-height: 83px; margin: 12px 14px; width: calc(10
   font-size: 10px;
   font-weight: 700;
   text-align: center;
-  padding: 9px 8px;
+  padding: 7px 7px;
   letter-spacing: .03em;
 }
 
 #pdf-template .pdf-table-ref th.col-detalle {
   text-align: left;
   padding-left: 10px;
-  width: 46%;
+  width: 62%;
 }
-#pdf-template .pdf-table-ref th.col-cant { width: 5%; }
-#pdf-template .pdf-table-ref th.col-uni { width: 6%; }
-#pdf-template .pdf-table-ref th.col-neto { width: 13%; }
-#pdf-template .pdf-table-ref th.col-desc { width: 5%; }
-#pdf-template .pdf-table-ref th.col-total { width: 25%; }
+#pdf-template .pdf-table-ref th.col-cant { width: 6%; }
+#pdf-template .pdf-table-ref th.col-uni { width: 8%; }
+#pdf-template .pdf-table-ref th.col-neto { width: 12%; }
+#pdf-template .pdf-table-ref th.col-total { width: 12%; }
 
 #pdf-template .pdf-table-ref td.col-detalle {
   text-align: left;
   vertical-align: top;
-  padding: 9px 12px;
+  padding: 7px 10px;
 }
 
 #pdf-template .pdf-table-ref td.col-cant {
   text-align: center;
   vertical-align: top;
-  font-size: 10px;
+  font-size: 10.5px;
   color: #111;
-  padding-top: 9px;
+  padding-top: 8px;
 }
 
 #pdf-template .pdf-table-ref td.col-uni {
   text-align: center;
   vertical-align: top;
-  font-size: 9px;
+  font-size: 9.5px;
   color: #333;
-  padding-top: 9px;
+  padding-top: 8px;
 }
 
 #pdf-template .pdf-table-ref td.col-neto {
   text-align: right;
   vertical-align: top;
-  font-size: 9.5px;
+  font-size: 10px;
   color: #111;
-  padding-top: 9px;
-}
-
-#pdf-template .pdf-table-ref td.col-desc {
-  text-align: center;
-  vertical-align: top;
-  font-size: 9px;
-  color: #555;
-  padding-top: 9px;
+  padding-top: 8px;
 }
 
 #pdf-template .pdf-table-ref td.col-total {
   text-align: right;
   vertical-align: top;
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 600;
   color: #111;
-  padding-top: 9px;
+  padding-top: 8px;
 }
 
 #pdf-template .item-name {
   font-weight: 700;
   font-size: 10.5px;
   color: #0d2836;
-  margin-bottom: 4px;
-  overflow-wrap: break-word;
+  margin-bottom: 3px;
+  overflow-wrap: anywhere;
   word-break: break-word;
 }
 
 #pdf-template .item-description {
-  font-size: 9px;
+  font-size: 9.5px;
   font-style: italic;
   color: #33444f;
-  line-height: 1.45;
-  overflow-wrap: break-word;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
   word-break: break-word;
 }
 
 #pdf-template .item-description p {
-  margin: 3px 0;
+  margin: 2px 0;
 }
 
 /* Reference Footer Summary Row */
@@ -290,35 +307,38 @@ textarea { resize: vertical; min-height: 83px; margin: 12px 14px; width: calc(10
 }
 
 #pdf-template .pdf-disclaimer-cell {
-  padding: 11px 13px !important;
+  padding: 10px 14px !important;
   background: #fff;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 #pdf-template .pdf-disclaimer-text {
-  font-size: 8px;
+  font-size: 8.5px;
   font-style: italic;
   color: #4a5a64;
   line-height: 1.45;
-  margin: 0 0 7px 0;
-  overflow-wrap: break-word;
+  margin: 0 0 6px 0;
+  overflow-wrap: anywhere;
   word-break: break-word;
 }
 
 #pdf-template .pdf-notes-text {
-  font-size: 8.5px;
+  font-size: 9.5px;
   color: #1b323f;
-  margin: 5px 0;
+  margin: 4px 0;
   line-height: 1.4;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   word-break: break-word;
 }
 
 #pdf-template .pdf-terms-text {
-  font-size: 8px;
+  font-size: 8.5px;
   color: #3d505c;
-  margin: 5px 0 0;
+  margin: 4px 0 0;
   line-height: 1.4;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   word-break: break-word;
 }
 
@@ -330,14 +350,20 @@ textarea { resize: vertical; min-height: 83px; margin: 12px 14px; width: calc(10
 
 #pdf-template .pdf-nested-totals {
   width: 100%;
+  max-width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
 }
 
 #pdf-template .pdf-nested-totals td {
   border: none;
   border-bottom: 1px solid #d3dce2;
-  padding: 7px 10px;
-  font-size: 10px;
+  padding: 8px 12px;
+  font-size: 10.5px;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
 }
 
 #pdf-template .pdf-nested-totals .tot-lbl {
@@ -348,7 +374,7 @@ textarea { resize: vertical; min-height: 83px; margin: 12px 14px; width: calc(10
   width: 46%;
   background: #f5faf8;
   white-space: normal;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   word-break: break-word;
 }
 
@@ -369,54 +395,58 @@ textarea { resize: vertical; min-height: 83px; margin: 12px 14px; width: calc(10
 #pdf-template .pdf-auth-section {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 48px;
-  margin-top: 26px;
-  padding: 0 12px;
+  gap: 30px;
+  margin-top: 18px;
+  padding: 0 14px;
 }
 
 #pdf-template .pdf-auth-col {
   text-align: center;
+  min-width: 0;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 #pdf-template .pdf-signature-line {
   border-bottom: 1px dashed #b6c3cc;
-  width: 180px;
-  margin: 0 auto 6px;
-  height: 40px;
+  width: 165px;
+  margin: 0 auto 5px;
+  height: 35px;
 }
 
 #pdf-template .pdf-auth-col b {
   display: block;
-  font-size: 9.5px;
+  font-size: 10.5px;
   color: #11222e;
 }
 
 #pdf-template .pdf-auth-col span {
   display: block;
-  font-size: 8.5px;
+  font-size: 9.5px;
   color: #556673;
   margin-top: 1px;
 }
 
 #pdf-template .pdf-auth-col small {
   display: block;
-  font-size: 7.5px;
+  font-size: 8.5px;
   color: #7b8d99;
   margin-top: 2px;
 }
 
 #pdf-template .pdf-bottom-bar {
-  margin-top: 20px;
+  margin-top: 14px;
   color: #7c8e99;
 }
 
 #pdf-template .pdf-bottom-address {
   text-align: center;
   border-top: 1px solid #d3dce2;
-  padding: 9px 2px 11px;
+  padding: 8px 4px 9px;
   color: #4a5a64;
-  font-size: 8.5px;
-  line-height: 1.6;
+  font-size: 9px;
+  line-height: 1.5;
   overflow-wrap: break-word;
   word-break: break-word;
 }
@@ -426,32 +456,36 @@ textarea { resize: vertical; min-height: 83px; margin: 12px 14px; width: calc(10
   color: #1d7a63;
   font-size: 10px;
   letter-spacing: .06em;
-  margin-bottom: 2px;
+  margin-bottom: 1px;
 }
 
 #pdf-template .pdf-bottom-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 10px;
   align-items: stretch;
   border-top: 1px solid #d3dce2;
-  padding: 12px 0 8px;
+  padding: 10px 0 7px;
 }
 
 #pdf-template .pdf-bottom-col {
   border: 1px solid #d3dce2;
   border-radius: 2px;
-  padding: 9px 10px 8px;
+  padding: 8px 10px 7px;
   background: #f8fbfa;
+  min-width: 0;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 #pdf-template .pdf-bottom-col b {
   display: block;
   color: #1d7a63;
-  font-size: 8.5px;
+  font-size: 9px;
   letter-spacing: .05em;
   text-transform: uppercase;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
   padding-bottom: 5px;
   border-bottom: 1px solid #d3dce2;
 }
@@ -459,26 +493,30 @@ textarea { resize: vertical; min-height: 83px; margin: 12px 14px; width: calc(10
 #pdf-template .pdf-bottom-col p {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
-  margin: 4px 0;
-  font-size: 8px;
-  line-height: 1.6;
+  gap: 8px;
+  margin: 3px 0;
+  font-size: 8.5px;
+  line-height: 1.55;
   color: #4a5a64;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   word-break: break-word;
 }
 
 #pdf-template .pdf-bottom-col p span {
   color: #2a3d4a;
   font-weight: 700;
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  text-align: right;
 }
 
 #pdf-template .pdf-bottom-line {
   border-top: 1px solid #d3dce2;
-  padding-top: 8px;
+  padding-top: 7px;
   text-align: center;
-  font-size: 7.5px;
+  font-size: 8px;
   color: #7c8e99;
   overflow-wrap: break-word;
   word-break: break-word;
@@ -491,10 +529,17 @@ textarea { resize: vertical; min-height: 83px; margin: 12px 14px; width: calc(10
   color: #115e4c;
   border: 1px solid #c9e2d8;
   border-radius: 3px;
-  padding: 2px 7px;
-  font-size: 8px;
+  padding: 2px 8px;
+  font-size: 9px;
   font-weight: 700;
   align-self: flex-end;
+}
+
+.app-button:disabled,
+.app-button.generating {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 /* MODIRU admin application */
@@ -504,7 +549,7 @@ textarea { resize: vertical; min-height: 83px; margin: 12px 14px; width: calc(10
 @media print {
   @page {
     size: A4;
-    margin: 10mm 12mm 10mm 12mm;
+    margin: 8mm;
   }
 
   html, body {
@@ -529,21 +574,30 @@ textarea { resize: vertical; min-height: 83px; margin: 12px 14px; width: calc(10
   #pdf-template {
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between;
+    justify-content: center !important;
     width: 100% !important;
     max-width: none !important;
-    min-height: 270mm !important;
-    padding: 8mm 8mm 6mm 8mm !important;
+    min-height: 281mm !important;
+    padding: 8mm !important;
     margin: 0 !important;
     background: #fff !important;
     color: #111 !important;
     font-family: Arial, Helvetica, sans-serif !important;
-    font-size: 10.5px !important;
+    font-size: 11px !important;
     line-height: 1.5 !important;
     box-shadow: none !important;
     border: 1px solid #d3dce2 !important;
     outline: 1px solid #eef2f5 !important;
     outline-offset: 0;
+  }
+
+  /* Force every direct child of pdf-template to respect container width */
+  #pdf-template > * {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
   }
 
   /* Ensure colors print correctly */
