@@ -39,13 +39,224 @@ function QuoteTable({ compact = false }: { compact?: boolean }) { return <div cl
 function Section({ title, detail, children, number }: { title: string; detail?: string; children: React.ReactNode; number?: string }) { return <Card className="quote-section"><div className="quote-section-head"><div>{number && <span className="section-number">{number}</span>}<div><h2>{title}</h2>{detail && <p>{detail}</p>}</div></div><ChevronDown size={16} /></div>{children}</Card> }
 function CheckRow({ label, checked, price, onChange }: { label: string; checked: boolean; price: string; onChange: () => void }) { return <label className="check-option"><input type="checkbox" checked={checked} onChange={onChange} /><span className="fake-check"><Check size={12} /></span><span>{label}</span><b>{price}</b></label> }
 
-function PdfTemplate({ client, material, dimensions, calc, notes }: { client: typeof customers[number]; material: typeof products[number]; dimensions: { width: string; height: string; depth: string; quantity: string }; calc: { beforeTax: number; igv: number; total: number; qty: number }; notes: string }) { const money = (value: number) => `S/ ${value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`; const today = new Intl.DateTimeFormat('es-PE', { dateStyle: 'long' }).format(new Date()); return <section id="pdf-template" aria-label="Cotización para impresión"><div className="pdf-header"><div className="pdf-company-wrap"><div className="pdf-brand"><span className="pdf-brand-mark">M</span><div>MODIRU MUEBLES<small>MUEBLES QUE HACEN ESPACIOS</small></div></div><div className="pdf-company"><b>MODIRU MUEBLES S.A.C.</b><br />RUC 20601234567<br />Av. Principal 123, Lima · +51 987 654 321<br />hola@modiru.pe · www.modiru.pe</div></div><div className="pdf-quote"><span className="pdf-quote-label">COTIZACIÓN</span><strong>N° COT-2024-001</strong><span>{today}</span></div></div><div className="pdf-title-row"><h1>COTIZACIÓN</h1><span>Vigencia: 15 días</span></div><div className="pdf-block"><div className="pdf-block-title">INFORMACIÓN</div><div className="pdf-info-grid"><div><p><b>Cliente:</b> {client.name}</p><p><b>RUC/DNI:</b> {client.taxId}</p><p><b>Contacto:</b> {client.name}</p><p><b>Email:</b> {client.email}</p><p><b>Teléfono:</b> {client.phone}</p></div><div><p><b>Proyecto:</b> Muebles de cocina</p><p><b>Ambiente:</b> Cocina</p><p><b>Medidas:</b> {dimensions.width} × {dimensions.height} × {dimensions.depth} cm</p><p><b>Entrega:</b> 22-oct-2026</p><p><b>Asesor:</b> Ana Torres</p></div></div></div><table className="pdf-table"><thead><tr><th>Concepto</th><th>Cantidad</th><th>Unidad</th><th>Unitario</th><th>Total</th></tr></thead><tbody><tr className="pdf-category"><td colSpan={5}>MUEBLES</td></tr><tr><td>{material.name}<br /><small>{material.detail}</small></td><td>{calc.qty}</td><td>{material.unit}</td><td>{money(material.price)}</td><td>{money(calc.beforeTax)}</td></tr><tr className="pdf-category"><td colSpan={5}>SERVICIOS ADICIONALES</td></tr><tr><td>Fabricación, traslado e instalación</td><td>1</td><td>servicio</td><td>{money(300)}</td><td>{money(300)}</td></tr></tbody></table><div className="pdf-footer-grid"><div className="pdf-small-block"><div className="pdf-block-title">OBSERVACIÓN</div><p>{notes}</p><div className="pdf-block-title">CONDICIÓN DE PAGO</div><p>50% adelanto, 50% contra entrega.</p></div><div className="pdf-small-block authorization"><div className="pdf-block-title">AUTORIZACIÓN</div><div className="signature-box" /><p>Ana Torres · Asesora comercial</p><small>Fecha de emisión: {today}</small></div><div className="pdf-totals"><p><span>Subtotal</span><b>{money(calc.beforeTax)}</b></p><p><span>IGV (18%)</span><b>{money(calc.igv)}</b></p><p className="pdf-final"><span>VALOR FINAL</span><b>{money(calc.total)}</b></p></div></div><p className="pdf-validity">Cotización válida por 15 días. Los precios están expresados en soles e incluyen IGV en el valor final.</p></section> }
+function PdfTemplate({ client, material, dimensions, calc, notes, selected }: { 
+  client: typeof customers[number]; 
+  material: typeof products[number]; 
+  dimensions: { width: string; height: string; depth: string; quantity: string }; 
+  calc: { area: number; edge: number; direct: number; cost: number; beforeTax: number; igv: number; total: number; qty: number }; 
+  notes: string;
+  selected?: { hinges: boolean; slides: boolean; handles: boolean; led: boolean; drawers: boolean; delivery: boolean; installation: boolean };
+}) {
+  const money = (value: number) => "S/ " + value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const today = new Intl.DateTimeFormat('es-PE', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date());
+
+  const hasDelivery = selected?.delivery ?? true;
+  const hasInstallation = selected?.installation ?? true;
+  const hasServices = hasDelivery || hasInstallation;
+
+  const servicesNet = hasServices ? Math.round(((hasDelivery ? 80 : 0) + (hasInstallation ? 220 : 0)) * 1.35 * 1.08 * 100) / 100 : 0;
+  const furnitureNet = Math.max(0, calc.beforeTax - servicesNet);
+  const unitFurnitureNet = furnitureNet / Math.max(1, calc.qty);
+
+  const accessoriesList = [
+    selected?.hinges && 'Bisagras cierre suave',
+    selected?.slides && 'Correderas telescópicas pesadas',
+    selected?.handles && 'Tiradores estándar de perfil',
+    selected?.drawers && 'Cajones interiores reforzados',
+    selected?.led && 'Iluminación LED cálida integrada'
+  ].filter(Boolean).join(', ') || 'Herrajes estándar';
+
+  return (
+    <section id="pdf-template" aria-label="Cotización para impresión">
+      <div className="pdf-header">
+        <div className="pdf-company-wrap">
+          <div className="pdf-brand">
+            <span className="pdf-brand-mark">M</span>
+            <div>
+              MODIRU MUEBLES
+              <small>MUEBLES QUE HACEN ESPACIOS</small>
+            </div>
+          </div>
+          <div className="pdf-company">
+            <b>MODIRU MUEBLES S.A.C.</b><br />
+            RUC 20601234567<br />
+            Av. Principal 123, Lima · +51 987 654 321<br />
+            hola@modiru.pe · www.modiru.pe
+          </div>
+        </div>
+        <div className="pdf-quote">
+          <span className="pdf-quote-label">COTIZACIÓN</span>
+          <strong>N° COT-2024-001</strong>
+          <span>Fecha de emisión: {today}</span>
+          <span className="pdf-quote-badge">Válida por 15 días</span>
+        </div>
+      </div>
+
+      <div className="pdf-block">
+        <div className="pdf-block-title">DATOS DEL CLIENTE Y PROYECTO</div>
+        <div className="pdf-info-grid">
+          <div>
+            <p><b>Cliente:</b> {client.name}</p>
+            <p><b>RUC / DNI:</b> {client.taxId}</p>
+            <p><b>Contacto:</b> {client.name}</p>
+            <p><b>Teléfono:</b> {client.phone}</p>
+            <p><b>Email:</b> {client.email}</p>
+          </div>
+          <div>
+            <p><b>Proyecto:</b> Fabricación de Muebles a Medida</p>
+            <p><b>Ambiente:</b> Cocina / Hogar</p>
+            <p><b>Medidas:</b> {dimensions.width} cm (ancho) × {dimensions.height} cm (alto) × {dimensions.depth} cm (fondo)</p>
+            <p><b>Plazo estimado:</b> 10 a 15 días hábiles</p>
+            <p><b>Asesor comercial:</b> Ana Torres (surco@modiru.pe)</p>
+          </div>
+        </div>
+      </div>
+
+      <table className="pdf-table-ref">
+        <thead>
+          <tr>
+            <th className="col-detalle">Detalle</th>
+            <th className="col-cant">Cant.</th>
+            <th className="col-uni">Uni.</th>
+            <th className="col-neto">Neto</th>
+            <th className="col-desc">% Desc</th>
+            <th className="col-total">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td className="col-detalle">
+              <div className="item-name">Fabricación de Mueble en Melamina a Medida</div>
+              <div className="item-description">
+                <p>Mueble personalizado fabricado en tableros de <b>{material.name}</b> ({material.brand} · {material.detail}) de 18 mm con protección antimicrobiana y máxima durabilidad.</p>
+                <p>Dimensiones: {dimensions.width} cm de ancho × {dimensions.height} cm de alto × {dimensions.depth} cm de profundidad. Área calculada: {calc.area.toFixed(2)} m² con {calc.edge.toFixed(2)} ml de tapacanto PVC termofusionado.</p>
+                <p>Accesorios y complementos: {accessoriesList}.</p>
+                <p>T° de trabajo:: 10-15 días hábi. aprox.</p>
+                <p>No incluye modificaciones estructurales civiles ni eléctricas.</p>
+              </div>
+            </td>
+            <td className="col-cant">{calc.qty}</td>
+            <td className="col-uni">UNID</td>
+            <td className="col-neto">{money(unitFurnitureNet)}</td>
+            <td className="col-desc"></td>
+            <td className="col-total">{money(furnitureNet)}</td>
+          </tr>
+
+          {hasServices && (
+            <tr>
+              <td className="col-detalle">
+                <div className="item-name">Servicio de Transporte, Logística y Montaje en Obra</div>
+                <div className="item-description">
+                  <p>Traslado especializado en unidad acondicionada con embalaje protector contra roces y golpes.</p>
+                  <p>Montaje, nivelación milimétrica y fijación estructural segura por personal técnico calificado.</p>
+                  <p>- Se coordina y verifica la correcta apertura y alineación de cajones y puertas.</p>
+                  <p>- Se entrega el área de trabajo limpia y lista para su uso.</p>
+                </div>
+              </td>
+              <td className="col-cant">1</td>
+              <td className="col-uni">GLB</td>
+              <td className="col-neto">{money(servicesNet)}</td>
+              <td className="col-desc"></td>
+              <td className="col-total">{money(servicesNet)}</td>
+            </tr>
+          )}
+
+          <tr className="pdf-summary-row">
+            <td colSpan={4} className="pdf-disclaimer-cell">
+              <p className="pdf-disclaimer-text">
+                Se reserva el derecho de cambiar o modificar su lista de precios sin previo aviso, corregir irregularidades u otros generados por sus empleados. En caso de una variación muy alta del dólar o materias primas, será necesario volver a recalcular los valores cotizados.
+              </p>
+              {notes && (
+                <p className="pdf-notes-text">
+                  <b>Observaciones:</b> {notes}
+                </p>
+              )}
+              <p className="pdf-terms-text">
+                <b>Condiciones:</b> 50% de anticipo al confirmar y 50% contra entrega e instalación conforme. Validez de la oferta: 15 días calendario.
+              </p>
+            </td>
+            <td colSpan={2} className="pdf-totals-cell">
+              <table className="pdf-nested-totals">
+                <tbody>
+                  <tr>
+                    <td className="tot-lbl">Descuento:</td>
+                    <td className="tot-val">0 %</td>
+                  </tr>
+                  <tr>
+                    <td className="tot-lbl">Neto:</td>
+                    <td className="tot-val">{money(calc.beforeTax)}</td>
+                  </tr>
+                  <tr>
+                    <td className="tot-lbl">IGV(18%):</td>
+                    <td className="tot-val">{money(calc.igv)}</td>
+                  </tr>
+                  <tr className="tot-final-row">
+                    <td className="tot-lbl">Total:</td>
+                    <td className="tot-val">{money(calc.total)}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div className="pdf-auth-section">
+        <div className="pdf-auth-col">
+          <div className="pdf-signature-line" />
+          <b>MODIRU MUEBLES S.A.C.</b>
+          <span>Ana Torres · Asesora Comercial</span>
+          <small>Firma y sello autorizado</small>
+        </div>
+        <div className="pdf-auth-col">
+          <div className="pdf-signature-line" />
+          <b>Aceptación del Cliente</b>
+          <span>{client.name}</span>
+          <small>DNI / RUC: {client.taxId} · Fecha: ____/____/2026</small>
+        </div>
+</div>
+
+<div className="pdf-bottom-bar">
+        <div className="pdf-bottom-address">
+          <b>MODIRU MUEBLES S.A.C.</b>
+          <span>RUC 20601234567 · Av. Principal 123, Lima – Perú · +51 987 654 321 · hola@modiru.pe</span>
+        </div>
+        <div className="pdf-bottom-grid">
+          <div className="pdf-bottom-col">
+            <b>Condiciones generales</b>
+            <p><span>Forma de pago:</span> 50% a la confirmación y 50% contra entrega.</p>
+            <p><span>Validez de la oferta:</span> 15 días calendario.</p>
+            <p><span>Plazo de entrega:</span> 10 a 15 días hábiles.</p>
+            <p><span>Garantía:</span> 12 meses por defectos de fabricación.</p>
+          </div>
+          <div className="pdf-bottom-col">
+            <b>Contacto comercial</b>
+            <p><span>Nombre:</span> Ana Torres</p>
+            <p><span>Cargo:</span> Asesora comercial</p>
+            <p><span>Teléfono:</span> +51 987 654 321</p>
+            <p><span>Correo:</span> surco@modiru.pe</p>
+          </div>
+          <div className="pdf-bottom-col">
+            <b>Cuentas para depósito</b>
+            <p><span>BCP (S/):</span> 305-1234567-0-89</p>
+            <p><span>CCI BCP:</span> 002-305-001234567089-17</p>
+            <p><span>Interbank (S/):</span> 200-3001234567-8</p>
+            <p><span>CCI Interbank:</span> 003-200-003001234567-89</p>
+          </div>
+        </div>
+        <div className="pdf-bottom-line">
+          <span>MODIRU MUEBLES S.A.C. · RUC 20601234567 · Av. Principal 123, Lima · www.modiru.pe · hola@modiru.pe</span>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function Quoter() {
   const [client, setClient] = useState(customers[0]); const [activeTab, setActiveTab] = useState('Información'); const [margin, setMargin] = useState('35'); const [waste, setWaste] = useState('8'); const [dimensions, setDimensions] = useState({ width: '240', height: '90', depth: '60', quantity: '1' }); const [material, setMaterial] = useState(products[0]); const [selected, setSelected] = useState({ hinges: true, slides: false, handles: true, led: false, drawers: true, delivery: true, installation: true }); const [notes, setNotes] = useState('Considerar tomacorrientes existentes en muro posterior.'); const [saved, setSaved] = useState(false)
   const calc = useMemo(() => { const w = moneyInput(dimensions.width) / 100; const h = moneyInput(dimensions.height) / 100; const d = moneyInput(dimensions.depth) / 100; const qty = Math.max(1, moneyInput(dimensions.quantity)); const area = (w * d * 2 + w * h * 2 + d * h * 2) * qty; const edge = (w * 2 + h * 2 + d * 2) * qty; const direct = area * material.price + edge * 7.5 + (selected.hinges ? 48 : 0) + (selected.slides ? 96 : 0) + (selected.handles ? 54 : 0) + (selected.led ? 120 : 0) + (selected.drawers ? 170 : 0) + (selected.delivery ? 80 : 0) + (selected.installation ? 220 : 0); const cost = direct * (1 + moneyInput(waste) / 100); const beforeTax = cost / Math.max(.1, 1 - moneyInput(margin) / 100); const igv = beforeTax * .18; return { area, edge, direct, cost, beforeTax, igv, total: beforeTax + igv, qty } }, [dimensions, material, selected, margin, waste])
   const toggle = (key: keyof typeof selected) => setSelected(s => ({ ...s, [key]: !s[key] })); const updateDim = (key: keyof typeof dimensions, value: string) => setDimensions(d => ({ ...d, [key]: value }));
-  return <div className="module quote-module"><PdfTemplate client={client} material={material} dimensions={dimensions} calc={calc} notes={notes} /><div className="page-heading"><div><span className="eyebrow">VENTAS / COTIZADOR</span><h1>Nueva cotización</h1><p>Configura el mueble, calcula costos y comparte tu propuesta.</p></div><div className="heading-actions"><span className={saved ? 'save-note visible' : 'save-note'}><Check size={14} /> Guardado</span><Button onClick={() => { setSaved(true); setTimeout(() => setSaved(false), 2000) }}><FileText size={15} /> Guardar borrador</Button><Button primary onClick={() => window.print()}><FileDown size={15} /> Generar PDF</Button></div></div><div className="quote-tabs">{['Información', 'Materiales', 'Configuración', 'Costos y precio'].map(t => <button className={activeTab === t ? 'active' : ''} onClick={() => { setActiveTab(t); const target = t === 'Información' ? '.quote-main .quote-section' : t === 'Materiales' ? '.quote-main .quote-section:nth-of-type(3)' : t === 'Configuración' ? '.quote-main .quote-section:nth-of-type(4)' : '.quote-main .quote-section:nth-of-type(5)'; document.querySelector(target)?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} key={t}>{t}</button>)}</div><div className="quote-layout"><div className="quote-main"><Section number="01" title="Datos de cotización" detail="Identifica y controla tu propuesta"><div className="form-grid four"><Field label="N.º de cotización"><input value="COT-2024-001" readOnly /></Field><Field label="Fecha de emisión"><input value="18/06/2024" readOnly /></Field><Field label="Vigencia"><input value="15 días" readOnly /></Field><Field label="Estado"><Select value="Borrador"><option>Borrador</option><option>Enviada</option><option>Aprobada</option></Select></Field></div></Section><Section number="02" title="Cliente y proyecto" detail="Busca un cliente o registra uno nuevo"><div className="customer-select"><Field label="Cliente existente"><Select value={client.id} onChange={e => setClient(customers.find(c => c.id === e.target.value) || customers[0])}>{customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</Select></Field><Button><Plus size={15} /> Nuevo cliente</Button></div><div className="form-grid three"><Field label="DNI / RUC"><input value={client.taxId} readOnly /></Field><Field label="Teléfono"><input value={client.phone} readOnly /></Field><Field label="Correo electrónico"><input value={client.email} readOnly /></Field></div><Field label="Dirección del proyecto"><input defaultValue="Av. Caminos del Inca 345, Santiago de Surco" /></Field></Section><Section number="03" title="Ambiente, mueble y dimensiones" detail="Las medidas se expresan en centímetros"><div className="form-grid three"><Field label="Ambiente"><Select><option>Cocina</option><option>Dormitorio</option><option>Sala</option><option>Oficina</option><option>Baño</option></Select></Field><Field label="Tipo de mueble"><Select><option>Mueble bajo</option><option>Mueble alto</option><option>Clóset</option><option>Rack TV</option><option>Personalizado</option></Select></Field><Field label="Cantidad"><input type="number" value={dimensions.quantity} onChange={e => updateDim('quantity', e.target.value)} min="1" /></Field></div><div className="form-grid three"><Field label="Ancho (cm)"><input type="number" value={dimensions.width} onChange={e => updateDim('width', e.target.value)} /></Field><Field label="Alto (cm)"><input type="number" value={dimensions.height} onChange={e => updateDim('height', e.target.value)} /></Field><Field label="Profundidad (cm)"><input type="number" value={dimensions.depth} onChange={e => updateDim('depth', e.target.value)} /></Field></div><div className="calculation-strip"><span><Calculator size={15} /> Área estimada <b>{calc.area.toFixed(2)} m²</b></span><span>Metros lineales <b>{calc.edge.toFixed(2)} ml</b></span><span>Volumen <b>{(moneyInput(dimensions.width) * moneyInput(dimensions.height) * moneyInput(dimensions.depth) / 1000000).toFixed(2)} m³</b></span></div></Section><Section number="04" title="Melamina y tapacanto" detail="Precios tomados desde la base de precios"><div className="form-grid three"><Field label="Producto de melamina" className="span-2"><Select value={material.id} onChange={e => setMaterial(products.find(p => p.id === e.target.value) || products[0])}>{products.filter(p => p.category === 'Melaminas').map(p => <option key={p.id} value={p.id}>{p.brand} · {p.name} · {formatMoney(p.price)}/m²</option>)}</Select></Field><Field label="Tapacanto"><Select><option>PVC Blanco 1 mm · S/ 7.50/ml</option><option>PVC Roble 2 mm · S/ 11.00/ml</option></Select></Field></div><div className="material-preview"><span className="material-swatch" /><div><b>{material.name}</b><small>{material.brand} · {material.detail} · {formatMoney(material.price)}/m²</small></div><span className="auto-price">{calc.area.toFixed(2)} m²</span></div></Section><Section number="05" title="Herrajes y accesorios" detail="Selecciona los complementos del proyecto"><div className="options-grid"><CheckRow label="Bisagras cierre suave" checked={selected.hinges} price="S/ 48.00" onChange={() => toggle('hinges')} /><CheckRow label="Correderas telescópicas" checked={selected.slides} price="S/ 96.00" onChange={() => toggle('slides')} /><CheckRow label="Tiradores estándar" checked={selected.handles} price="S/ 54.00" onChange={() => toggle('handles')} /><CheckRow label="Cajones interiores" checked={selected.drawers} price="S/ 170.00" onChange={() => toggle('drawers')} /><CheckRow label="Iluminación LED" checked={selected.led} price="S/ 120.00" onChange={() => toggle('led')} /></div></Section><Section number="06" title="Observaciones y referencia" detail="Agrega indicaciones o una imagen del ambiente"><textarea rows={4} value={notes} onChange={e => setNotes(e.target.value)} /><label className="upload-box"><Upload size={18} /><b>Subir imagen o referencia</b><span>JPG, PNG o plano hasta 5 MB</span><input type="file" /></label></Section></div><aside className="quote-side"><Card className="price-card"><div className="side-kicker"><Calculator size={14} /> RESUMEN DE PRECIO</div><h2>Precio final</h2><p>Calculado con los parámetros actuales</p><div className="price-total">{formatMoney(calc.total)}<small>Incluye IGV (18%)</small></div><div className="range-line"><span>Margen de utilidad</span><b>{margin}%</b></div><input type="range" min="10" max="60" value={margin} onChange={e => setMargin(e.target.value)} /><div className="summary-lines"><div><span>Costo directo</span><b>{formatMoney(calc.direct)}</b></div><div><span>Gastos / Merma ({waste}%)</span><label><input value={waste} onChange={e => setWaste(e.target.value)} type="number" /> {formatMoney(calc.cost - calc.direct)}</label></div><div className="line-strong"><span>Costo total</span><b>{formatMoney(calc.cost)}</b></div><div><span>Precio antes de impuestos</span><b>{formatMoney(calc.beforeTax)}</b></div><div><span>IGV</span><b>{formatMoney(calc.igv)}</b></div></div><Button primary className="full-button"><Send size={15} /> Enviar al cliente</Button><Button className="full-button"><FileDown size={15} /> Descargar PDF</Button></Card><Card className="profit-side"><div className="profit-badge"><Sparkles size={16} /></div><div><span>Rentabilidad estimada</span><b>{margin}%</b><small>Margen saludable para este proyecto</small></div></Card><Section title="Servicios adicionales"><CheckRow label="Despacho a domicilio" checked={selected.delivery} price="S/ 80.00" onChange={() => toggle('delivery')} /><CheckRow label="Instalación en domicilio" checked={selected.installation} price="S/ 220.00" onChange={() => toggle('installation')} /></Section><Section title="Condiciones comerciales"><div className="terms-list"><p><b>Forma de pago</b><span>50% adelanto · 50% contra entrega</span></p><p><b>Fabricación</b><span>15 días hábiles</span></p><p><b>Garantía</b><span>12 meses</span></p></div></Section></aside></div></div> }
+  return <div className="module quote-module"><PdfTemplate client={client} material={material} dimensions={dimensions} calc={calc} notes={notes} selected={selected} /><div className="page-heading"><div><span className="eyebrow">VENTAS / COTIZADOR</span><h1>Nueva cotización</h1><p>Configura el mueble, calcula costos y comparte tu propuesta.</p></div><div className="heading-actions"><span className={saved ? 'save-note visible' : 'save-note'}><Check size={14} /> Guardado</span><Button onClick={() => { setSaved(true); setTimeout(() => setSaved(false), 2000) }}><FileText size={15} /> Guardar borrador</Button><Button primary onClick={() => window.print()}><FileDown size={15} /> Generar PDF</Button></div></div><div className="quote-tabs">{['Información', 'Materiales', 'Configuración', 'Costos y precio'].map(t => <button className={activeTab === t ? 'active' : ''} onClick={() => { setActiveTab(t); const target = t === 'Información' ? '.quote-main .quote-section' : t === 'Materiales' ? '.quote-main .quote-section:nth-of-type(3)' : t === 'Configuración' ? '.quote-main .quote-section:nth-of-type(4)' : '.quote-main .quote-section:nth-of-type(5)'; document.querySelector(target)?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }} key={t}>{t}</button>)}</div><div className="quote-layout"><div className="quote-main"><Section number="01" title="Datos de cotización" detail="Identifica y controla tu propuesta"><div className="form-grid four"><Field label="N.º de cotización"><input value="COT-2024-001" readOnly /></Field><Field label="Fecha de emisión"><input value="18/06/2024" readOnly /></Field><Field label="Vigencia"><input value="15 días" readOnly /></Field><Field label="Estado"><Select value="Borrador"><option>Borrador</option><option>Enviada</option><option>Aprobada</option></Select></Field></div></Section><Section number="02" title="Cliente y proyecto" detail="Busca un cliente o registra uno nuevo"><div className="customer-select"><Field label="Cliente existente"><Select value={client.id} onChange={e => setClient(customers.find(c => c.id === e.target.value) || customers[0])}>{customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</Select></Field><Button><Plus size={15} /> Nuevo cliente</Button></div><div className="form-grid three"><Field label="DNI / RUC"><input value={client.taxId} readOnly /></Field><Field label="Teléfono"><input value={client.phone} readOnly /></Field><Field label="Correo electrónico"><input value={client.email} readOnly /></Field></div><Field label="Dirección del proyecto"><input defaultValue="Av. Caminos del Inca 345, Santiago de Surco" /></Field></Section><Section number="03" title="Ambiente, mueble y dimensiones" detail="Las medidas se expresan en centímetros"><div className="form-grid three"><Field label="Ambiente"><Select><option>Cocina</option><option>Dormitorio</option><option>Sala</option><option>Oficina</option><option>Baño</option></Select></Field><Field label="Tipo de mueble"><Select><option>Mueble bajo</option><option>Mueble alto</option><option>Clóset</option><option>Rack TV</option><option>Personalizado</option></Select></Field><Field label="Cantidad"><input type="number" value={dimensions.quantity} onChange={e => updateDim('quantity', e.target.value)} min="1" /></Field></div><div className="form-grid three"><Field label="Ancho (cm)"><input type="number" value={dimensions.width} onChange={e => updateDim('width', e.target.value)} /></Field><Field label="Alto (cm)"><input type="number" value={dimensions.height} onChange={e => updateDim('height', e.target.value)} /></Field><Field label="Profundidad (cm)"><input type="number" value={dimensions.depth} onChange={e => updateDim('depth', e.target.value)} /></Field></div><div className="calculation-strip"><span><Calculator size={15} /> Área estimada <b>{calc.area.toFixed(2)} m²</b></span><span>Metros lineales <b>{calc.edge.toFixed(2)} ml</b></span><span>Volumen <b>{(moneyInput(dimensions.width) * moneyInput(dimensions.height) * moneyInput(dimensions.depth) / 1000000).toFixed(2)} m³</b></span></div></Section><Section number="04" title="Melamina y tapacanto" detail="Precios tomados desde la base de precios"><div className="form-grid three"><Field label="Producto de melamina" className="span-2"><Select value={material.id} onChange={e => setMaterial(products.find(p => p.id === e.target.value) || products[0])}>{products.filter(p => p.category === 'Melaminas').map(p => <option key={p.id} value={p.id}>{p.brand} · {p.name} · {formatMoney(p.price)}/m²</option>)}</Select></Field><Field label="Tapacanto"><Select><option>PVC Blanco 1 mm · S/ 7.50/ml</option><option>PVC Roble 2 mm · S/ 11.00/ml</option></Select></Field></div><div className="material-preview"><span className="material-swatch" /><div><b>{material.name}</b><small>{material.brand} · {material.detail} · {formatMoney(material.price)}/m²</small></div><span className="auto-price">{calc.area.toFixed(2)} m²</span></div></Section><Section number="05" title="Herrajes y accesorios" detail="Selecciona los complementos del proyecto"><div className="options-grid"><CheckRow label="Bisagras cierre suave" checked={selected.hinges} price="S/ 48.00" onChange={() => toggle('hinges')} /><CheckRow label="Correderas telescópicas" checked={selected.slides} price="S/ 96.00" onChange={() => toggle('slides')} /><CheckRow label="Tiradores estándar" checked={selected.handles} price="S/ 54.00" onChange={() => toggle('handles')} /><CheckRow label="Cajones interiores" checked={selected.drawers} price="S/ 170.00" onChange={() => toggle('drawers')} /><CheckRow label="Iluminación LED" checked={selected.led} price="S/ 120.00" onChange={() => toggle('led')} /></div></Section><Section number="06" title="Observaciones y referencia" detail="Agrega indicaciones o una imagen del ambiente"><textarea rows={4} value={notes} onChange={e => setNotes(e.target.value)} /><label className="upload-box"><Upload size={18} /><b>Subir imagen o referencia</b><span>JPG, PNG o plano hasta 5 MB</span><input type="file" /></label></Section></div><aside className="quote-side"><Card className="price-card"><div className="side-kicker"><Calculator size={14} /> RESUMEN DE PRECIO</div><h2>Precio final</h2><p>Calculado con los parámetros actuales</p><div className="price-total">{formatMoney(calc.total)}<small>Incluye IGV (18%)</small></div><div className="range-line"><span>Margen de utilidad</span><b>{margin}%</b></div><input type="range" min="10" max="60" value={margin} onChange={e => setMargin(e.target.value)} /><div className="summary-lines"><div><span>Costo directo</span><b>{formatMoney(calc.direct)}</b></div><div><span>Gastos / Merma ({waste}%)</span><label><input value={waste} onChange={e => setWaste(e.target.value)} type="number" /> {formatMoney(calc.cost - calc.direct)}</label></div><div className="line-strong"><span>Costo total</span><b>{formatMoney(calc.cost)}</b></div><div><span>Precio antes de impuestos</span><b>{formatMoney(calc.beforeTax)}</b></div><div><span>IGV</span><b>{formatMoney(calc.igv)}</b></div></div><Button primary className="full-button"><Send size={15} /> Enviar al cliente</Button><Button className="full-button"><FileDown size={15} /> Descargar PDF</Button></Card><Card className="profit-side"><div className="profit-badge"><Sparkles size={16} /></div><div><span>Rentabilidad estimada</span><b>{margin}%</b><small>Margen saludable para este proyecto</small></div></Card><Section title="Servicios adicionales"><CheckRow label="Despacho a domicilio" checked={selected.delivery} price="S/ 80.00" onChange={() => toggle('delivery')} /><CheckRow label="Instalación en domicilio" checked={selected.installation} price="S/ 220.00" onChange={() => toggle('installation')} /></Section><Section title="Condiciones comerciales"><div className="terms-list"><p><b>Forma de pago</b><span>50% adelanto · 50% contra entrega</span></p><p><b>Fabricación</b><span>15 días hábiles</span></p><p><b>Garantía</b><span>12 meses</span></p></div></Section></aside></div></div> }
 
 function PriceBase() { const [category, setCategory] = useState<ProductCategory>('Melaminas'); const [search, setSearch] = useState(''); const visible = products.filter(p => p.category === category && p.name.toLowerCase().includes(search.toLowerCase())); return <div className="module"><div className="page-heading"><div><span className="eyebrow">CONFIGURACIÓN COMERCIAL</span><h1>Base de precios</h1><p>Administra materiales, productos y servicios del cotizador.</p></div><Button primary><Plus size={16} /> Agregar producto</Button></div><Card><div className="filter-row"><div className="search-field"><Search size={15} /><input placeholder="Buscar producto..." value={search} onChange={e => setSearch(e.target.value)} /></div><button className="filter-button"><SlidersHorizontal size={15} /> Filtros</button><span className="results-count">{visible.length} productos</span></div><div className="category-tabs">{categories.map(c => <button className={category === c ? 'active' : ''} onClick={() => setCategory(c)} key={c}>{c}</button>)}</div><div className="table-scroll"><table><thead><tr><th>Producto</th><th>Marca / modelo</th><th>Detalle</th><th>Unidad</th><th>Precio</th><th>Estado</th><th>Actualizado</th><th /></tr></thead><tbody>{visible.map(p => <tr key={p.id}><td><b>{p.name}</b><small>{p.id}</small></td><td>{p.brand}<small>{p.model}</small></td><td>{p.detail}</td><td>{p.unit}</td><td><b>{formatMoney(p.price)}</b></td><td><Status>{p.status}</Status></td><td>{p.updated}</td><td><button className="row-more">•••</button></td></tr>)}</tbody></table></div></Card></div> }
 function Directory({ type }: { type: 'Clientes' | 'Proyectos' }) { const isClients = type === 'Clientes'; return <div className="module"><div className="page-heading"><div><span className="eyebrow">GESTIÓN</span><h1>{type}</h1><p>{isClients ? 'Centraliza la información y el historial de tus clientes.' : 'Haz seguimiento a cada proyecto de principio a fin.'}</p></div><Button primary><Plus size={16} /> {isClients ? 'Nuevo cliente' : 'Nuevo proyecto'}</Button></div><Card><div className="filter-row"><div className="search-field"><Search size={15} /><input placeholder={`Buscar ${type.toLowerCase()}...`} /></div><button className="filter-button"><SlidersHorizontal size={15} /> Filtros</button></div><div className="table-scroll"><table><thead><tr>{isClients ? <><th>Cliente</th><th>DNI / RUC</th><th>Contacto</th><th>Proyectos</th><th>Cotizaciones</th><th>Estado</th></> : <><th>Proyecto</th><th>Cliente</th><th>Ambiente</th><th>Fecha</th><th>Monto</th><th>Estado</th><th>Responsable</th></>}</tr></thead><tbody>{(isClients ? customers : projects).map((row: any) => isClients ? <tr key={row.id}><td><div className="person-cell"><div className="avatar tiny">{row.name.slice(0,2).toUpperCase()}</div><b>{row.name}</b></div></td><td>{row.taxId}</td><td>{row.phone}<small>{row.email}</small></td><td>{row.projects}</td><td>{row.quotes}</td><td><Status>{row.status}</Status></td></tr> : <tr key={row.id}><td><b>{row.name}</b><small>{row.id}</small></td><td>{row.customer}</td><td>{row.environment}</td><td>{row.date}</td><td><b>{formatMoney(row.amount)}</b></td><td><Status>{row.status}</Status></td><td>{row.owner}</td></tr>)}</tbody></table></div></Card></div> }
