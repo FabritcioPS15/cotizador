@@ -29,7 +29,7 @@ function Field({ label, children, className = '' }: { label: string; children: R
 function Select({ children, value, onChange }: { children: React.ReactNode; value?: string; onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void }) { return onChange ? <select value={value} onChange={onChange}>{children}</select> : <select defaultValue={value}>{children}</select> }
 
 function Sidebar({ active, setActive, open, setOpen }: { active: Module; setActive: (m: Module) => void; open: boolean; setOpen: (v: boolean) => void }) {
-  return <><aside className={`sidebar ${open ? 'sidebar-open' : ''}`}><div className="sidebar-brand"><div className="logo-mark">M</div><div><b>MODIRU</b><span>Muebles que hacen espacios</span></div><button className="sidebar-close" onClick={() => setOpen(false)}><X size={17} /></button></div><div className="sidebar-label">GESTIÓN COMERCIAL</div><nav>{nav.map(({ label, icon: Icon }) => <button key={label} className={active === label ? 'nav-item active' : 'nav-item'} onClick={() => { setActive(label); setOpen(false) }}><Icon size={17} /><span>{label}</span>{label === 'Cotizador' && <em>Nuevo</em>}</button>)}</nav><div className="sidebar-footer"><div className="avatar">AT</div><div><b>Ana Torres</b><span>Asesora comercial</span></div><ChevronDown size={15} /></div></aside>{open && <button className="sidebar-scrim" onClick={() => setOpen(false)} aria-label="Cerrar menú" />}</>
+  return <><aside className={`sidebar ${open ? 'sidebar-open' : ''}`}><div className="sidebar-brand"><img className="sidebar-brand-logo" src="/modiru.png" alt="MODIRU" /><div><b>MODIRU</b><span>Muebles que hacen espacios</span></div><button className="sidebar-close" onClick={() => setOpen(false)}><X size={17} /></button></div><div className="sidebar-label">GESTIÓN COMERCIAL</div><nav>{nav.map(({ label, icon: Icon }) => <button key={label} className={active === label ? 'nav-item active' : 'nav-item'} onClick={() => { setActive(label); setOpen(false) }}><Icon size={17} /><span>{label}</span>{label === 'Cotizador' && <em>Nuevo</em>}</button>)}</nav><div className="sidebar-footer"><div className="avatar">AT</div><div><b>Ana Torres</b><span>Asesora comercial</span></div><ChevronDown size={15} /></div></aside>{open && <button className="sidebar-scrim" onClick={() => setOpen(false)} aria-label="Cerrar menú" />}</>
 }
 function Header({ active, onMenu, query = '', onQuery = () => {}, results = [], onPick = () => {} }: { active: Module; onMenu: () => void; query?: string; onQuery?: (v: string) => void; results?: { id: string; label: string; sub: string; to: Module }[]; onPick?: (to: Module) => void }) {
   return (
@@ -122,17 +122,7 @@ function PdfTemplate({ client, material, dimensions, calc, notes, selected, meta
       <div className="pdf-header">
         <div className="pdf-company-wrap">
           <div className="pdf-brand">
-            <span className="pdf-brand-mark">M</span>
-            <div>
-              MODIRU MUEBLES
-              <small>MUEBLES QUE HACEN ESPACIOS</small>
-            </div>
-          </div>
-          <div className="pdf-company">
-            <b>MODIRU MUEBLES S.A.C.</b><br />
-            RUC 20601234567<br />
-            Av. Principal 123, Lima · +51 987 654 321<br />
-            hola@modiru.pe · www.modiru.pe
+            <img className="pdf-brand-mark" src="/modiru.png" alt="MODIRU" />
           </div>
         </div>
         <div className="pdf-quote">
