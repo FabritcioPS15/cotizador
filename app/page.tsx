@@ -29,9 +29,9 @@ function Field({ label, children, className = '' }: { label: string; children: R
 function Select({ children, value, onChange }: { children: React.ReactNode; value?: string; onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void }) { return onChange ? <select value={value} onChange={onChange}>{children}</select> : <select defaultValue={value}>{children}</select> }
 
 function Sidebar({ active, setActive, open, setOpen }: { active: Module; setActive: (m: Module) => void; open: boolean; setOpen: (v: boolean) => void }) {
-  return <><aside className={`sidebar ${open ? 'sidebar-open' : ''}`}><div className="sidebar-brand"><img className="sidebar-brand-logo" src="/modiru.png" alt="MODIRU" /><div><b>MODIRU</b><span>Muebles que hacen espacios</span></div><button className="sidebar-close" onClick={() => setOpen(false)}><X size={17} /></button></div><div className="sidebar-label">GESTIÓN COMERCIAL</div><nav>{nav.map(({ label, icon: Icon }) => <button key={label} className={active === label ? 'nav-item active' : 'nav-item'} onClick={() => { setActive(label); setOpen(false) }}><Icon size={17} /><span>{label}</span>{label === 'Cotizador' && <em>Nuevo</em>}</button>)}</nav><div className="sidebar-footer"><div className="avatar">AT</div><div><b>Ana Torres</b><span>Asesora comercial</span></div><ChevronDown size={15} /></div></aside>{open && <button className="sidebar-scrim" onClick={() => setOpen(false)} aria-label="Cerrar menú" />}</>
+  return <><aside className={`sidebar ${open ? 'sidebar-open' : ''}`}><div className="sidebar-brand"><img className="sidebar-brand-logo" src="/modiru.png" alt="MODIRU" /><div></div><button className="sidebar-close" onClick={() => setOpen(false)}><X size={17} /></button></div><div className="sidebar-label">GESTIÓN COMERCIAL</div><nav>{nav.map(({ label, icon: Icon }) => <button key={label} className={active === label ? 'nav-item active' : 'nav-item'} onClick={() => { setActive(label); setOpen(false) }}><Icon size={17} /><span>{label}</span>{label === 'Cotizador' && <em>Nuevo</em>}</button>)}</nav><div className="sidebar-footer"><div className="avatar">AT</div><div><b>Ana Torres</b><span>Asesora comercial</span></div><ChevronDown size={15} /></div></aside>{open && <button className="sidebar-scrim" onClick={() => setOpen(false)} aria-label="Cerrar menú" />}</>
 }
-function Header({ active, onMenu, query = '', onQuery = () => {}, results = [], onPick = () => {} }: { active: Module; onMenu: () => void; query?: string; onQuery?: (v: string) => void; results?: { id: string; label: string; sub: string; to: Module }[]; onPick?: (to: Module) => void }) {
+function Header({ active, onMenu, query = '', onQuery = () => { }, results = [], onPick = () => { } }: { active: Module; onMenu: () => void; query?: string; onQuery?: (v: string) => void; results?: { id: string; label: string; sub: string; to: Module }[]; onPick?: (to: Module) => void }) {
   return (
     <header className="admin-header">
       <button className="menu-button" onClick={onMenu}><Menu size={20} /></button>
@@ -121,8 +121,17 @@ function PdfTemplate({ client, material, dimensions, calc, notes, selected, meta
     <section id="pdf-template" aria-label="Cotización para impresión">
       <div className="pdf-header">
         <div className="pdf-company-wrap">
-          <div className="pdf-brand">
-            <img className="pdf-brand-mark" src="/modiru.png" alt="MODIRU" />
+          <div className="pdf-company">
+            <div className="pdf-brand">
+              <img className="pdf-brand-mark" src="/modiru.png" alt="MODIRU" />
+            </div>
+            <div className="pdf-company-data">
+              <b>MODIRU MUEBLES S.A.C.</b>
+              <span>RUC 20601234567</span>
+              <span>Av. Principal 123, Lima – Perú</span>
+              <span>+51 987 654 321 · hola@modiru.pe</span>
+              <span>www.modiru.pe</span>
+            </div>
           </div>
         </div>
         <div className="pdf-quote">
@@ -158,11 +167,11 @@ function PdfTemplate({ client, material, dimensions, calc, notes, selected, meta
       <table className="pdf-table-ref">
         <thead>
           <tr>
-            <th className="col-detalle">Detalle</th>
-            <th className="col-cant">Cant.</th>
-            <th className="col-uni">Uni.</th>
-            <th className="col-neto">Neto</th>
-            <th className="col-total">Total</th>
+            <th className="col-detalle"><span className="th-label">Detalle</span></th>
+            <th className="col-cant"><span className="th-label">Cant.</span></th>
+            <th className="col-uni"><span className="th-label">Uni.</span></th>
+            <th className="col-neto"><span className="th-label">Neto</span></th>
+            <th className="col-total"><span className="th-label">Total</span></th>
           </tr>
         </thead>
         <tbody>
@@ -416,8 +425,11 @@ function Quoter({ customers, onAddCustomer }: { customers: Customer[]; onAddCust
         const sliceHeightPx = Math.floor((pageH / mmPerPx) * 2); // canvas pixels per page
         let yOffset = 0;
         while (yOffset < canvas.height) {
+          const remaining = canvas.height - yOffset;
+          // Skip rounding slivers (blank trailing page artifact)
+          if (remaining < 40) break;
           if (yOffset > 0) pdf.addPage();
-          const sliceH = Math.min(sliceHeightPx, canvas.height - yOffset);
+          const sliceH = Math.min(sliceHeightPx, remaining);
           const sliceCanvas = document.createElement('canvas');
           sliceCanvas.width = canvas.width;
           sliceCanvas.height = sliceH;
@@ -449,7 +461,6 @@ function Quoter({ customers, onAddCustomer }: { customers: Customer[]; onAddCust
         meta={{ number: quote.number, date: quote.date, validity: quote.validity, status: quote.status, address: quote.address, projectName: quote.projectName, environment: quote.environment, furnitureType: quote.furnitureType, advisor: quote.advisor, leadDays: leadText, tapacanto: tapacanto.label, paymentTerms: quote.paymentTerms, guarantee: quote.guarantee, curSymbol: currency.symbol, curRate: currency.rate }} overrideTotal={customTotal ? moneyInput(customTotal) : null} />
       <div className="page-heading">
         <div>
-          <span className="eyebrow">VENTAS / COTIZADOR</span>
           <h1>Nueva cotización</h1>
           <p>Configura el mueble, calcula costos y comparte tu propuesta.</p>
         </div>
@@ -473,84 +484,84 @@ function Quoter({ customers, onAddCustomer }: { customers: Customer[]; onAddCust
       <div className="quote-layout" data-step={step}>
         <div className="quote-main">
           <div className="wiz-step" data-step="0">
-          <Section number="01" id="quote-sec-datos" icon={FileText} title="Datos de cotización" detail="Número, fecha y vigencia de tu propuesta">
-            <div className="form-grid four">
-              <Field label="N.º de cotización"><input value={quote.number} onChange={e => setQuoteField('number', e.target.value)} /></Field>
-              <Field label="Fecha de emisión"><input value={quote.date} onChange={e => setQuoteField('date', e.target.value)} /></Field>
-              <Field label="Vigencia"><input value={quote.validity} onChange={e => setQuoteField('validity', e.target.value)} /></Field>
-              <Field label="Estado"><Select value={quote.status} onChange={e => setQuoteField('status', e.target.value)}><option>Borrador</option><option>Enviada</option><option>Aprobada</option></Select></Field>
-            </div>
-          </Section>
+            <Section number="01" id="quote-sec-datos" icon={FileText} title="Datos de cotización" detail="Número, fecha y vigencia de tu propuesta">
+              <div className="form-grid four">
+                <Field label="N.º de cotización"><input value={quote.number} onChange={e => setQuoteField('number', e.target.value)} /></Field>
+                <Field label="Fecha de emisión"><input value={quote.date} onChange={e => setQuoteField('date', e.target.value)} /></Field>
+                <Field label="Vigencia"><input value={quote.validity} onChange={e => setQuoteField('validity', e.target.value)} /></Field>
+                <Field label="Estado"><Select value={quote.status} onChange={e => setQuoteField('status', e.target.value)}><option>Borrador</option><option>Enviada</option><option>Aprobada</option></Select></Field>
+              </div>
+            </Section>
           </div>
           <div className="wiz-step" data-step="1">
-          <Section number="02" id="quote-sec-cliente" icon={UserRound} title="Cliente y proyecto" detail="Selecciona el cliente y define el alcance del trabajo">
-            <div className="customer-select">
-              <Field label="Cliente existente"><Select value={client.id} onChange={e => setClient(customers.find(c => c.id === e.target.value) || customers[0])}>{customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</Select></Field>
-              <Button onClick={() => setShowClientModal(true)}><Plus size={15} /> Nuevo cliente</Button>
-            </div>
-            <div className="client-info">
-              <span><b>Cliente:</b>{client.name}</span>
-              <span><b>DNI / RUC:</b>{client.taxId}</span>
-              <span><b>Teléfono:</b>{client.phone}</span>
-              <span><b>Correo:</b>{client.email}</span>
-            </div>
-            <div className="form-grid two">
-              <Field label="Dirección del proyecto"><input value={quote.address} onChange={e => setQuoteField('address', e.target.value)} /></Field>
-              <Field label="Plazo estimado de entrega"><LeadTime qty={leadQty} unit={leadUnit} onQty={setLeadQty} onUnit={setLeadUnit} /></Field>
-            </div>
-          </Section>
+            <Section number="02" id="quote-sec-cliente" icon={UserRound} title="Cliente y proyecto" detail="Selecciona el cliente y define el alcance del trabajo">
+              <div className="customer-select">
+                <Field label="Cliente existente"><Select value={client.id} onChange={e => setClient(customers.find(c => c.id === e.target.value) || customers[0])}>{customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</Select></Field>
+                <Button onClick={() => setShowClientModal(true)}><Plus size={15} /> Nuevo cliente</Button>
+              </div>
+              <div className="client-info">
+                <span><b>Cliente:</b>{client.name}</span>
+                <span><b>DNI / RUC:</b>{client.taxId}</span>
+                <span><b>Teléfono:</b>{client.phone}</span>
+                <span><b>Correo:</b>{client.email}</span>
+              </div>
+              <div className="form-grid two">
+                <Field label="Dirección del proyecto"><input value={quote.address} onChange={e => setQuoteField('address', e.target.value)} /></Field>
+                <Field label="Plazo estimado de entrega"><LeadTime qty={leadQty} unit={leadUnit} onQty={setLeadQty} onUnit={setLeadUnit} /></Field>
+              </div>
+            </Section>
           </div>
           <div className="wiz-step" data-step="2">
-          <Section number="03" id="quote-sec-producto" icon={Box} title="Ambiente, mueble y dimensiones" detail="Las medidas se expresan en centímetros">
-            <div className="form-grid three">
-              <Field label="Ambiente"><Select value={quote.environment} onChange={e => setQuoteField('environment', e.target.value)}><option>Cocina</option><option>Dormitorio</option><option>Sala</option><option>Oficina</option><option>Baño</option></Select></Field>
-              <Field label="Tipo de mueble"><Select value={quote.furnitureType} onChange={e => setQuoteField('furnitureType', e.target.value)}><option>Mueble bajo</option><option>Mueble alto</option><option>Clóset</option><option>Rack TV</option><option>Personalizado</option></Select></Field>
-              <Field label="Cantidad"><input type="number" value={dimensions.quantity} onChange={e => updateDim('quantity', e.target.value)} min="1" /></Field>
-            </div>
-            <div className="form-grid three">
-              <Field label="Ancho (cm)"><input type="number" value={dimensions.width} onChange={e => updateDim('width', e.target.value)} /></Field>
-              <Field label="Alto (cm)"><input type="number" value={dimensions.height} onChange={e => updateDim('height', e.target.value)} /></Field>
-              <Field label="Profundidad (cm)"><input type="number" value={dimensions.depth} onChange={e => updateDim('depth', e.target.value)} /></Field>
-            </div>
-            <div className="calc-panel">
-              <div className="calc-item">
-                <span className="calc-ico area"><Ruler size={16} /></span>
-                <div className="calc-txt"><small>Área estimada</small><b>{calc.area.toFixed(2)}<em>m²</em></b></div>
+            <Section number="03" id="quote-sec-producto" icon={Box} title="Ambiente, mueble y dimensiones" detail="Las medidas se expresan en centímetros">
+              <div className="form-grid three">
+                <Field label="Ambiente"><Select value={quote.environment} onChange={e => setQuoteField('environment', e.target.value)}><option>Cocina</option><option>Dormitorio</option><option>Sala</option><option>Oficina</option><option>Baño</option></Select></Field>
+                <Field label="Tipo de mueble"><Select value={quote.furnitureType} onChange={e => setQuoteField('furnitureType', e.target.value)}><option>Mueble bajo</option><option>Mueble alto</option><option>Clóset</option><option>Rack TV</option><option>Personalizado</option></Select></Field>
+                <Field label="Cantidad"><input type="number" value={dimensions.quantity} onChange={e => updateDim('quantity', e.target.value)} min="1" /></Field>
               </div>
-              <div className="calc-item">
-                <span className="calc-ico edge"><Move size={16} /></span>
-                <div className="calc-txt"><small>Metros lineales</small><b>{calc.edge.toFixed(2)}<em>ml</em></b></div>
+              <div className="form-grid three">
+                <Field label="Ancho (cm)"><input type="number" value={dimensions.width} onChange={e => updateDim('width', e.target.value)} /></Field>
+                <Field label="Alto (cm)"><input type="number" value={dimensions.height} onChange={e => updateDim('height', e.target.value)} /></Field>
+                <Field label="Profundidad (cm)"><input type="number" value={dimensions.depth} onChange={e => updateDim('depth', e.target.value)} /></Field>
               </div>
-              <div className="calc-item">
-                <span className="calc-ico vol"><Cuboid size={16} /></span>
-                <div className="calc-txt"><small>Volumen</small><b>{volume.toFixed(2)}<em>m³</em></b></div>
+              <div className="calc-panel">
+                <div className="calc-item">
+                  <span className="calc-ico area"><Ruler size={16} /></span>
+                  <div className="calc-txt"><small>Área estimada</small><b>{calc.area.toFixed(2)}<em>m²</em></b></div>
+                </div>
+                <div className="calc-item">
+                  <span className="calc-ico edge"><Move size={16} /></span>
+                  <div className="calc-txt"><small>Metros lineales</small><b>{calc.edge.toFixed(2)}<em>ml</em></b></div>
+                </div>
+                <div className="calc-item">
+                  <span className="calc-ico vol"><Cuboid size={16} /></span>
+                  <div className="calc-txt"><small>Volumen</small><b>{volume.toFixed(2)}<em>m³</em></b></div>
+                </div>
               </div>
-            </div>
-          </Section>
-          <Section number="04" icon={Package} title="Melamina y tapacanto" detail="Precios tomados desde la base de precios">
-            <div className="form-grid three">
-              <Field label="Producto de melamina" className="span-2"><Select value={material.id} onChange={e => setMaterial(products.find(p => p.id === e.target.value) || products[0])}>{products.filter(p => p.category === 'Melaminas').map(p => <option key={p.id} value={p.id}>{p.brand} · {p.name} · {formatMoney(p.price)}/m²</option>)}</Select></Field>
-              <Field label="Tapacanto"><Select value={tapacanto.id} onChange={e => setTapacanto(tapacantos.find(t => t.id === e.target.value) || tapacantos[0])}>{tapacantos.map(t => <option key={t.id} value={t.id}>{t.label} · {formatMoney(t.price)}/ml</option>)}</Select></Field>
-            </div>
-            <div className="material-preview">
-              <span className="material-swatch" style={{ backgroundImage: `url("${material.swatch && !material.swatch.startsWith('#') ? material.swatch : woodTexture(material.swatch || '#c9a27a')}")` }} />
-              <div><b>{material.name}</b><small>{material.brand} · {material.detail} · {formatMoney(material.price)}/m²</small></div>
-              <span className="auto-price">{calc.area.toFixed(2)} m²</span>
-            </div>
-          </Section>
-          <Section number="05" icon={SlidersHorizontal} title="Herrajes y accesorios" detail="Selecciona los complementos del proyecto">
-            <div className="options-grid">
-              <CheckRow label="Bisagras cierre suave" checked={selected.hinges} price="S/ 48.00" onChange={() => toggle('hinges')} />
-              <CheckRow label="Correderas telescópicas" checked={selected.slides} price="S/ 96.00" onChange={() => toggle('slides')} />
-              <CheckRow label="Tiradores estándar" checked={selected.handles} price="S/ 54.00" onChange={() => toggle('handles')} />
-              <CheckRow label="Cajones interiores" checked={selected.drawers} price="S/ 170.00" onChange={() => toggle('drawers')} />
-              <CheckRow label="Iluminación LED" checked={selected.led} price="S/ 120.00" onChange={() => toggle('led')} />
-            </div>
-          </Section>
-          <Section number="06" icon={ClipboardList} title="Observaciones y referencia" detail="Agrega indicaciones o una imagen del ambiente">
-            <textarea rows={4} value={notes} onChange={e => setNotes(e.target.value)} />
-            <label className="upload-box"><Upload size={18} /><b>Subir imagen o referencia</b><span>JPG, PNG o plano hasta 5 MB</span><input type="file" /></label>
-          </Section>
+            </Section>
+            <Section number="04" icon={Package} title="Melamina y tapacanto" detail="Precios tomados desde la base de precios">
+              <div className="form-grid three">
+                <Field label="Producto de melamina" className="span-2"><Select value={material.id} onChange={e => setMaterial(products.find(p => p.id === e.target.value) || products[0])}>{products.filter(p => p.category === 'Melaminas').map(p => <option key={p.id} value={p.id}>{p.brand} · {p.name} · {formatMoney(p.price)}/m²</option>)}</Select></Field>
+                <Field label="Tapacanto"><Select value={tapacanto.id} onChange={e => setTapacanto(tapacantos.find(t => t.id === e.target.value) || tapacantos[0])}>{tapacantos.map(t => <option key={t.id} value={t.id}>{t.label} · {formatMoney(t.price)}/ml</option>)}</Select></Field>
+              </div>
+              <div className="material-preview">
+                <span className="material-swatch" style={{ backgroundImage: `url("${material.swatch && !material.swatch.startsWith('#') ? material.swatch : woodTexture(material.swatch || '#c9a27a')}")` }} />
+                <div><b>{material.name}</b><small>{material.brand} · {material.detail} · {formatMoney(material.price)}/m²</small></div>
+                <span className="auto-price">{calc.area.toFixed(2)} m²</span>
+              </div>
+            </Section>
+            <Section number="05" icon={SlidersHorizontal} title="Herrajes y accesorios" detail="Selecciona los complementos del proyecto">
+              <div className="options-grid">
+                <CheckRow label="Bisagras cierre suave" checked={selected.hinges} price="S/ 48.00" onChange={() => toggle('hinges')} />
+                <CheckRow label="Correderas telescópicas" checked={selected.slides} price="S/ 96.00" onChange={() => toggle('slides')} />
+                <CheckRow label="Tiradores estándar" checked={selected.handles} price="S/ 54.00" onChange={() => toggle('handles')} />
+                <CheckRow label="Cajones interiores" checked={selected.drawers} price="S/ 170.00" onChange={() => toggle('drawers')} />
+                <CheckRow label="Iluminación LED" checked={selected.led} price="S/ 120.00" onChange={() => toggle('led')} />
+              </div>
+            </Section>
+            <Section number="06" icon={ClipboardList} title="Observaciones y referencia" detail="Agrega indicaciones o una imagen del ambiente">
+              <textarea rows={4} value={notes} onChange={e => setNotes(e.target.value)} />
+              <label className="upload-box"><Upload size={18} /><b>Subir imagen o referencia</b><span>JPG, PNG o plano hasta 5 MB</span><input type="file" /></label>
+            </Section>
           </div>
         </div>
         <aside className="quote-side" data-step="3">
