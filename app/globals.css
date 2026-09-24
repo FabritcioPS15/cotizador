@@ -886,7 +886,7 @@ footer {
   table-layout: fixed;
   width: 100%;
   padding-bottom: 12px;
-  border-bottom: 2.5px solid #1d7a63;
+  border-bottom: 2.5px solid #25465f;
 }
 
 #pdf-template .pdf-header>* {
@@ -895,24 +895,52 @@ footer {
 }
 
 #pdf-template .pdf-company-wrap {
-  width: auto;
   padding-right: 20px;
   overflow-wrap: break-word;
   word-wrap: break-word;
   white-space: normal;
 }
 
+#pdf-template .pdf-company {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
 #pdf-template .pdf-brand {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 #pdf-template .pdf-brand-mark {
-  width: 176px;
-  height: 88px;
+  width: 172px;
+  height: 86px;
   display: block;
   object-fit: contain;
   object-position: left center;
+}
+
+#pdf-template .pdf-company-data {
+  display: grid;
+  gap: 2px;
+  padding-left: 16px;
+  border-left: 1.5px solid #c9d6db;
+  min-width: 0;
+}
+
+#pdf-template .pdf-company-data b {
+  font-size: 11px;
+  font-weight: 800;
+  color: #000000;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+#pdf-template .pdf-company-data span {
+  font-size: 9px;
+  color: #555;
 }
 
 #pdf-template .pdf-quote {
@@ -982,18 +1010,17 @@ footer {
 }
 
 #pdf-template .pdf-block-title {
-  display: flex !important;
-  align-items: center !important;
-  min-height: 26px !important;
-  height: 26px !important;
-  padding: 0 14px !important;
-  background: #1d7a63;
+  display: block !important;
+  min-height: 28px !important;
+  height: 28px !important;
+  line-height: 20px !important;
+  padding: 0 4px !important;
+  background: #25465f;
   color: #fff;
   font-size: 9px;
   font-weight: 800;
   letter-spacing: .1em;
   text-transform: uppercase;
-  line-height: 1 !important;
   box-sizing: border-box;
 }
 
@@ -1035,7 +1062,9 @@ footer {
   font-weight: 700;
 }
 
-/* Items table - matching reference layout */
+/* ── Tabla de partidas (tabla de detalle) ──────────────────────────── */
+
+/* Tabla contenedora */
 #pdf-template .pdf-table-ref {
   width: 100%;
   max-width: 100%;
@@ -1047,6 +1076,7 @@ footer {
   border: 1px solid #d3dce2;
 }
 
+/* Base de todas las celdas (encabezado + datos) */
 #pdf-template .pdf-table-ref th,
 #pdf-template .pdf-table-ref td {
   border: 1px solid #d3dce2;
@@ -1058,40 +1088,40 @@ footer {
   vertical-align: middle;
 }
 
+/* Fila de cabeceras (barra azul oscuro) */
 #pdf-template .pdf-table-ref th {
-  background: #1d7a63;
+  background: #25465f;
   color: #fff;
   font-size: 10px;
   font-weight: 700;
   padding: 0 !important;
-  height: 30px !important;
-  vertical-align: middle !important;
+  height: 33px !important;
+  vertical-align: top !important;
 }
 
-#pdf-template .pdf-table-ref th span {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  height: 100% !important;
-  width: 100% !important;
-  line-height: 1 !important;
-  padding: 0 6px !important;
+/* Etiqueta dentro de cada cabecera (texto arriba: vertical top + line-height menor que la barra) */
+#pdf-template .pdf-table-ref th .th-label {
+  display: block !important;
+  line-height: 22px !important;
+  text-align: center !important;
+  padding: 2px 10px 0 !important;
   box-sizing: border-box !important;
   white-space: nowrap;
   letter-spacing: .03em;
 }
 
-#pdf-template .pdf-table-ref th.col-detalle span {
-  justify-content: flex-start !important;
+/* Columna DETALLE (izquierda, la más ancha) */
+#pdf-template .pdf-table-ref th.col-detalle {
+  text-align: left;
+  width: 30%;
+}
+
+#pdf-template .pdf-table-ref th.col-detalle .th-label {
+  text-align: left !important;
   padding-left: 10px !important;
 }
 
-#pdf-template .pdf-table-ref th.col-detalle {
-  text-align: left;
-  padding-left: 10px;
-  width: 59%;
-}
-
+/* Columnas CANT., UNI., NETO y TOTAL (anchos fijos) */
 #pdf-template .pdf-table-ref th.col-cant {
   width: 9%;
 }
@@ -1111,7 +1141,7 @@ footer {
 #pdf-template .pdf-table-ref td.col-detalle {
   text-align: left;
   vertical-align: middle;
-  padding: 7px 10px;
+  padding: 4px 10px;
 }
 
 #pdf-template .pdf-table-ref td.col-cant {
@@ -1241,7 +1271,7 @@ footer {
   text-align: left;
   padding-left: 4px;
   width: 46%;
-  background: #f5faf8;
+  background: #f2f6f8;
   white-space: normal;
   overflow-wrap: anywhere;
   word-break: break-word;
@@ -1254,10 +1284,10 @@ footer {
 
 #pdf-template .pdf-nested-totals .tot-final-row td {
   border-bottom: none;
-  background: #eaf4f0;
+  background: #eef2f6;
   font-weight: 800;
   font-size: 11px;
-  color: #115e4c;
+  color: #1b3242;
 }
 
 /* Signatures & bottom bar */
@@ -1288,7 +1318,7 @@ footer {
 }
 
 #pdf-template .pdf-signature-line {
-  border-bottom: 1.5px dashed #1d7a63;
+  border-bottom: 1.5px dashed #25465f;
   width: 170px;
   margin: 12px auto 10px;
   height: 30px;
@@ -1298,7 +1328,7 @@ footer {
   display: block;
   font-size: 10px;
   font-weight: 700;
-  color: #1d7a63;
+  color: #25465f;
   letter-spacing: .03em;
   text-transform: uppercase;
 }
@@ -1328,7 +1358,7 @@ footer {
   align-items: center !important;
   justify-content: center !important;
   min-height: 26px !important;
-  background: #1d7a63;
+  background: #25465f;
   color: #ffffff;
   padding: 4px 12px !important;
   border-radius: 4px 4px 0 0;
@@ -1348,7 +1378,7 @@ footer {
 }
 
 #pdf-template .pdf-bottom-address span {
-  color: #d1f2eb;
+  color: #d9e3ea;
   font-size: 8.5px;
 }
 
@@ -1378,12 +1408,12 @@ footer {
 }
 
 #pdf-template .pdf-bottom-col b {
-  display: flex !important;
-  align-items: center !important;
-  min-height: 24px !important;
-  height: 24px !important;
-  background: #eaf4f0;
-  color: #1d7a63;
+  display: block !important;
+  min-height: 26px !important;
+  height: 26px !important;
+  line-height: 26px !important;
+  background: #eef2f6;
+  color: #25465f;
   font-size: 8.5px;
   font-weight: 700;
   letter-spacing: .04em;
@@ -1391,7 +1421,6 @@ footer {
   margin: -8px -10px 6px -10px;
   padding: 0 10px !important;
   border-bottom: 1px solid #d3dce2;
-  line-height: 1 !important;
 }
 
 #pdf-template .pdf-bottom-col p {
@@ -1423,7 +1452,7 @@ footer {
   display: inline-block;
   margin-top: 4px;
   background: #ffffff;
-  color: #115e4c;
+  color: #1b3242;
   border: 1px solid #ffffff;
   border-radius: 3px;
   padding: 2px 8px;
@@ -1450,19 +1479,23 @@ footer {
   position: fixed;
   inset: 0 auto 0 0;
   width: 244px;
-  background: #102a3a;
+  background: linear-gradient(180deg, #123548 0%, #0a1e2a 100%);
   color: #d8e5ea;
   display: flex;
   flex-direction: column;
-  padding: 24px 15px;
-  z-index: 20
+  padding: 22px 14px;
+  z-index: 20;
+  border-right: 1px solid #1c3d4d
 }
 
 .sidebar-brand {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 0 10px 28px
+  gap: 12px;
+  padding: 0 8px 24px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid #1c3d4d
 }
 
 .sidebar-brand b {
@@ -1480,10 +1513,11 @@ footer {
 }
 
 .sidebar-brand-logo {
-  width: 84px;
-  height: 42px;
+  width: 150px;
+  height: 75px;
   object-fit: contain;
-  object-position: left center;
+  object-position: center;
+  filter: brightness(0) invert(1);
   flex-shrink: 0;
 }
 
@@ -1509,38 +1543,54 @@ footer {
 
 .sidebar-label {
   font-size: 9px;
-  letter-spacing: .12em;
-  color: #76909b;
-  padding: 0 12px 11px;
+  letter-spacing: .14em;
+  color: #5f7d8b;
+  padding: 0 12px 12px;
   font-weight: 800
 }
 
 .sidebar nav {
   display: grid;
-  gap: 4px
+  gap: 5px
 }
 
 .nav-item {
   border: 0;
   background: transparent;
-  color: #a8bec6;
+  color: #9db4be;
   display: flex;
   align-items: center;
-  gap: 11px;
-  border-radius: 7px;
-  padding: 10px 12px;
+  gap: 12px;
+  border-radius: 9px;
+  padding: 11px 12px;
   text-align: left;
-  font-size: 12px
+  font-size: 12px;
+  font-weight: 600;
+  transition: background .16s ease, color .16s ease, box-shadow .16s ease
 }
 
-.nav-item:hover,
-.nav-item.active {
-  background: #1a4254;
-  color: #fff
+.nav-item svg {
+  color: #6f8d99;
+  transition: color .16s ease
+}
+
+.nav-item:hover {
+  background: #163c4d;
+  color: #eaf4f7
+}
+
+.nav-item:hover svg {
+  color: #9ed3c4
 }
 
 .nav-item.active {
-  box-shadow: inset 3px 0 #4db698
+  background: linear-gradient(90deg, #1d6d5a 0%, #1a5560 100%);
+  color: #fff;
+  box-shadow: inset 3px 0 #4db698, 0 3px 10px #0a1e2a40
+}
+
+.nav-item.active svg {
+  color: #9fe0cf
 }
 
 .nav-item em {
@@ -1558,8 +1608,12 @@ footer {
   display: flex;
   align-items: center;
   gap: 9px;
-  border-top: 1px solid #315063;
-  padding: 18px 9px 0
+  border-top: 1px solid #1c3d4d;
+  padding: 20px 9px 6px
+}
+
+.sidebar-footer .avatar {
+  box-shadow: 0 0 0 3px #163c4d
 }
 
 .sidebar-footer b,
@@ -1607,7 +1661,13 @@ footer {
 
 .admin-content {
   margin-left: 244px;
-  min-height: 100vh
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column
+}
+
+.admin-content>.module {
+  flex: 1
 }
 
 .admin-header {
@@ -1754,9 +1814,9 @@ footer {
 }
 
 .module {
-  max-width: 1320px;
+  max-width: none;
   margin: auto;
-  padding: 22px 26px 14px
+  padding: 22px 18px 14px
 }
 
 .page-heading {
@@ -1836,7 +1896,8 @@ footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 13px 18px 10px
+  min-height: 58px;
+  padding: 10px 18px
 }
 
 .app-card-header h2 {
@@ -2860,7 +2921,7 @@ td small {
   background: #fcfdfd
 }
 
-.currency-row > span {
+.currency-row>span {
   font-size: 10px;
   font-weight: 700;
   color: #6b7d83
@@ -3023,7 +3084,7 @@ td small {
   font-weight: 800
 }
 
-.summary-lines > div > span {
+.summary-lines>div>span {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -3247,6 +3308,7 @@ td small {
 .admin-footer {
   display: flex;
   justify-content: space-between;
+  margin-top: auto;
   padding: 25px 34px;
   color: #9aa6ab;
   font-size: 9px
@@ -3330,13 +3392,27 @@ th.sortable span {
 }
 
 @keyframes toast-in {
-  from { transform: translateY(12px); opacity: 0 }
-  to { transform: translateY(0); opacity: 1 }
+  from {
+    transform: translateY(12px);
+    opacity: 0
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1
+  }
 }
 
 @keyframes pop-in {
-  from { transform: scale(1.08); color: #0f9d78 }
-  to { transform: scale(1); color: inherit }
+  from {
+    transform: scale(1.08);
+    color: #0f9d78
+  }
+
+  to {
+    transform: scale(1);
+    color: inherit
+  }
 }
 
 .val-pop {
@@ -3353,13 +3429,25 @@ th.sortable span {
 }
 
 @keyframes fade-in {
-  from { opacity: 0 }
-  to { opacity: 1 }
+  from {
+    opacity: 0
+  }
+
+  to {
+    opacity: 1
+  }
 }
 
 @keyframes modal-in {
-  from { opacity: 0; transform: translateY(14px) scale(.97) }
-  to { opacity: 1; transform: none }
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(.97)
+  }
+
+  to {
+    opacity: 1;
+    transform: none
+  }
 }
 
 .notif-wrap,
