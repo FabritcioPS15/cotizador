@@ -16,7 +16,7 @@
   --color-ring: var(--ring);
   --radius-md: .55rem;
   --radius-lg: .75rem;
-  --font-sans: 'Geist', 'Arial', sans-serif;
+  --font-sans: 'Inter', var(--font-inter), Arial, sans-serif;
   --font-mono: 'Geist Mono', monospace;
 }
 
@@ -47,8 +47,10 @@ body {
   margin: 0;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, sans-serif;
-  font-size: 12px;
+  font-family: var(--font-inter), 'Inter', Arial, sans-serif;
+  font-size: 12.5px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 button,
@@ -1793,30 +1795,41 @@ footer {
   justify-content: center;
   gap: 7px;
   border: 1px solid #dce5e8;
-  border-radius: 6px;
+  border-radius: 8px;
   background: #fff;
   color: #445963;
-  padding: 9px 13px;
-  font-size: 11px;
+  padding: 9px 14px;
+  font-size: 11.5px;
   font-weight: 700;
-  white-space: nowrap
+  white-space: nowrap;
+  transition: border-color .15s ease, background .15s ease, transform .1s ease
 }
 
 .app-button:hover {
-  border-color: #79ac9d
+  border-color: #79ac9d;
+  background: #fbfdfc
+}
+
+.app-button:active {
+  transform: translateY(1px)
 }
 
 .app-button-primary {
-  background: #288b73;
-  border-color: #288b73;
+  background: linear-gradient(160deg, #2f9d81, #1d7a63);
+  border-color: #1d7a63;
   color: #fff
+}
+
+.app-button-primary:hover {
+  background: linear-gradient(160deg, #37ac8e, #1e8a6e);
+  border-color: #1e8a6e
 }
 
 .app-card {
   background: #fff;
   border: 1px solid #e1e9ec;
-  border-radius: 9px;
-  box-shadow: 0 2px 6px #20364205
+  border-radius: 11px;
+  box-shadow: 0 1px 2px rgba(16, 34, 42, .04), 0 8px 24px -18px rgba(16, 34, 42, .18);
 }
 
 .app-card-header {
@@ -2191,24 +2204,29 @@ td small {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 0 18px;
-  padding: 0 4px
+  margin: 2px 0 20px;
+  padding: 10px 14px;
+  background: #fff;
+  border: 1px solid #e1e9ec;
+  border-radius: 11px;
+  box-shadow: 0 1px 2px rgba(16, 34, 42, .04);
+  gap: 16px
 }
 
 .stepper-track {
   display: flex;
   align-items: center;
-  gap: 18px
+  gap: 32px
 }
 
 .stepper-item {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   background: none;
   border: 0;
-  padding: 6px 4px;
+  padding: 6px 2px;
   cursor: pointer;
   border-radius: 10px
 }
@@ -2218,10 +2236,12 @@ td small {
   position: absolute;
   left: 100%;
   top: 50%;
-  width: 18px;
+  width: 32px;
   height: 2px;
-  background: #dfe8ea;
-  border-radius: 2px
+  background: #e3eaec;
+  border-radius: 2px;
+  margin-left: 0;
+  transform: translateY(-50%)
 }
 
 .stepper-item.done:not(:last-child)::after {
@@ -2232,32 +2252,35 @@ td small {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 25px;
+  height: 25px;
   border-radius: 50%;
   background: #eaf0f2;
   color: #7a898f;
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 800;
-  flex: none
+  flex: none;
+  transition: all .2s ease
 }
 
 .stepper-item.done .stepper-dot {
-  background: #1d7a63;
+  background: linear-gradient(160deg, #27a084, #1d7a63);
   color: #fff
 }
 
 .stepper-item.active .stepper-dot {
-  background: #1d7a63;
+  background: linear-gradient(160deg, #27a084, #1d7a63);
   color: #fff;
-  box-shadow: 0 0 0 4px rgba(29, 122, 99, .15)
+  box-shadow: 0 0 0 4px rgba(29, 122, 99, .16)
 }
 
 .stepper-label {
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 12.5px;
+  font-weight: 800;
   color: #93a0a6;
-  white-space: nowrap
+  white-space: nowrap;
+  letter-spacing: -.01em;
+  transition: color .2s ease
 }
 
 .stepper-item.active .stepper-label {
@@ -2265,20 +2288,23 @@ td small {
 }
 
 .stepper-hint {
-  display: none
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #8a9aa0;
+  white-space: nowrap
 }
 
 .quote-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(290px, .7fr);
-  gap: 17px
+  grid-template-columns: minmax(0, 1.55fr) minmax(300px, .7fr);
+  gap: 18px
 }
 
 .quote-main,
 .quote-side {
   min-width: 0;
   display: grid;
-  gap: 14px;
+  gap: 16px;
   align-content: start
 }
 
@@ -2296,7 +2322,8 @@ td small {
 }
 
 .quote-section {
-  overflow: hidden
+  overflow: hidden;
+  scroll-margin-top: 18px;
 }
 
 .quote-section-head {
@@ -2304,12 +2331,13 @@ td small {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 12px 16px;
+  padding: 15px 18px;
   border: 0;
   border-bottom: 1px solid #edf1f3;
   background: transparent;
   text-align: left;
-  cursor: pointer
+  cursor: pointer;
+  transition: background .15s ease
 }
 
 .quote-section-head:hover {
@@ -2319,23 +2347,27 @@ td small {
 .quote-section-head>div {
   display: flex;
   align-items: center;
-  gap: 10px
+  gap: 11px
 }
 
 .quote-section-head h2 {
-  font-size: 12px;
+  font-size: 13px;
   margin: 0;
-  color: #314852
+  color: #20343e;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  line-height: 1.25
 }
 
 .quote-section-head p {
-  font-size: 10px;
-  color: #9aa6ab;
-  margin: 4px 0 0
+  font-size: 10.5px;
+  color: #8ba0a8;
+  margin: 3px 0 0;
+  line-height: 1.3
 }
 
 .quote-section-head>svg {
-  color: #a5b1b6;
+  color: #b3bec3;
   transition: transform .15s ease
 }
 
@@ -2346,30 +2378,32 @@ td small {
 .section-number {
   display: grid;
   place-items: center;
-  width: 25px;
-  height: 25px;
-  border-radius: 7px;
-  background: #e4f2ed;
-  color: #278870;
-  font-size: 9px;
-  font-weight: 800
+  width: 27px;
+  height: 27px;
+  flex: 0 0 27px;
+  border-radius: 8px;
+  background: linear-gradient(160deg, #e9f7f1, #dcefe7);
+  color: #1d7a63;
+  font-size: 10px;
+  font-weight: 800;
+  box-shadow: inset 0 0 0 1px rgba(29, 122, 99, .14)
 }
 
 .section-icon {
   display: grid;
   place-items: center;
-  width: 24px;
-  height: 24px;
-  flex: 0 0 24px;
-  border-radius: 7px;
+  width: 27px;
+  height: 27px;
+  flex: 0 0 27px;
+  border-radius: 8px;
   background: #eef4f6;
   color: #5b7078
 }
 
 .form-grid {
   display: grid;
-  gap: 10px;
-  padding: 12px 16px 0
+  gap: 13px 14px;
+  padding: 15px 18px 0
 }
 
 .form-grid.four {
@@ -2386,10 +2420,11 @@ td small {
 
 .form-field {
   display: grid;
-  gap: 6px;
-  color: #75848b;
-  font-size: 10px;
-  font-weight: 700
+  gap: 7px;
+  color: #5c6c74;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .02em
 }
 
 .form-field input,
@@ -2398,39 +2433,62 @@ td small {
 .settings-form input {
   width: 100%;
   border: 1px solid #dce5e8;
-  border-radius: 5px;
+  border-radius: 8px;
   background: #fff;
-  color: #334a54;
-  padding: 9px 10px;
+  color: #22343c;
+  padding: 9px 12px;
   outline: 0;
-  font-size: 11px
+  font-size: 12px;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease
 }
 
 .form-field input,
 .form-field select {
-  height: 34px
+  height: 36px
+}
+
+.form-field select:not([size]) {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23687f88' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 30px
+}
+
+.form-field input:hover,
+.form-field select:hover,
+.quote-section textarea:hover {
+  border-color: #c3d2d7
 }
 
 .form-field input:focus,
 .form-field select:focus,
 .quote-section textarea:focus {
-  border-color: #6eae9b;
-  box-shadow: 0 0 0 2px #6eae9b20
+  border-color: #4f9d87;
+  box-shadow: 0 0 0 3px rgba(79, 157, 135, .16);
+  background: #fdfefe
 }
 
 .quote-section>.form-field {
-  margin: 10px 16px
+  margin: 12px 18px
 }
 
 .quote-section .form-grid:last-child {
-  padding-bottom: 14px
+  padding-bottom: 16px
+}
+
+.quote-section textarea {
+  margin: 14px 18px 0;
+  width: calc(100% - 36px);
+  resize: vertical;
+  line-height: 1.5
 }
 
 .customer-select {
   display: flex;
   align-items: flex-end;
   gap: 10px;
-  padding: 12px 16px 0
+  padding: 15px 18px 0
 }
 
 .customer-select .form-field {
@@ -2438,29 +2496,40 @@ td small {
 }
 
 .customer-select .app-button {
-  height: 34px
+  height: 36px;
+  border-radius: 8px
 }
 
 .client-info {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 7px 18px;
-  padding: 10px 16px 0;
-  font-size: 11px;
-  color: #22312e;
-  font-weight: 600
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 13px 18px 0
 }
 
 .client-info span {
-  display: inline-flex;
-  gap: 6px;
-  white-space: nowrap
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  padding: 9px 11px;
+  background: linear-gradient(180deg, #fafcfd, #f4f7f8);
+  border: 1px solid #e8edef;
+  border-radius: 9px;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #22343c;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis
 }
 
 .client-info b {
-  color: #8a989e;
-  font-weight: 500
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  color: #93a0a6
 }
 
 .span-2 {
@@ -2470,25 +2539,25 @@ td small {
 .calc-panel {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin: 12px 16px
+  gap: 12px;
+  margin: 14px 18px
 }
 
 .calc-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
+  gap: 11px;
+  padding: 12px 14px;
   background: linear-gradient(180deg, #ffffff, #fbfdfc);
   border: 1px solid #e3ecea;
-  border-radius: 8px;
+  border-radius: 10px;
   box-shadow: 0 1px 2px rgba(20, 40, 45, .05)
 }
 
 .calc-ico {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2522,11 +2591,11 @@ td small {
   color: #8a9aa1;
   font-weight: 700;
   white-space: nowrap;
-  margin-bottom: 2px
+  margin-bottom: 3px
 }
 
 .calc-txt b {
-  font-size: 16px;
+  font-size: 16.5px;
   color: #22343c;
   font-weight: 800;
   letter-spacing: -.01em;
@@ -2544,18 +2613,18 @@ td small {
 .material-preview {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin: 12px 16px;
-  padding: 8px 10px;
-  background: #f8fafb;
+  gap: 12px;
+  margin: 14px 18px;
+  padding: 10px 12px;
+  background: linear-gradient(180deg, #fafcfb, #f5f8f7);
   border: 1px solid #e8eef0;
-  border-radius: 6px
+  border-radius: 10px
 }
 
 .material-swatch {
-  width: 40px;
-  height: 40px;
-  border-radius: 6px;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
   background: linear-gradient(135deg, #dac3a3, #b99870);
   background-size: cover;
   background-position: center;
@@ -2564,38 +2633,39 @@ td small {
   flex: none
 }
 
+.material-preview b {
+  font-size: 12px;
+  color: #38505a;
+  letter-spacing: -.01em
+}
+
+.material-preview small {
+  font-size: 10px;
+  color: #8c9aa0;
+  margin-top: 4px
+}
+
 .material-preview b,
 .material-preview small {
   display: block
 }
 
-.material-preview b {
-  font-size: 11px;
-  color: #38505a
-}
-
-.material-preview small {
-  font-size: 9px;
-  color: #8c9aa0;
-  margin-top: 3px
-}
-
 .auto-price {
   margin-left: auto;
   color: #2a8c73;
-  font-size: 10px;
-  font-weight: 700
+  font-size: 10.5px;
+  font-weight: 800
 }
 
 .options-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  padding: 10px 16px 12px;
-  gap: 1px 22px
+  padding: 12px 18px 14px;
+  gap: 1px 26px
 }
 
 .side-checklist {
-  padding: 8px 16px 14px
+  padding: 6px 18px 14px
 }
 
 .side-checklist .check-option:last-child {
@@ -2605,11 +2675,13 @@ td small {
 .check-option {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 0;
+  gap: 9px;
+  padding: 9px 0;
   border-bottom: 1px solid #eef2f3;
-  color: #536770;
-  font-size: 11px
+  color: #415761;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer
 }
 
 .check-option input {
@@ -2617,45 +2689,54 @@ td small {
 }
 
 .fake-check {
-  width: 16px;
-  height: 16px;
-  border: 1px solid #bfcdd1;
-  border-radius: 4px;
+  width: 17px;
+  height: 17px;
+  border: 1px solid #bcc9cd;
+  border-radius: 5px;
   display: grid;
   place-items: center;
-  color: transparent
+  color: transparent;
+  transition: all .15s ease;
+  background: #fff
 }
 
 .check-option input:checked+.fake-check {
-  background: #2d9278;
-  border-color: #2d9278;
+  background: linear-gradient(160deg, #2f9d81, #1d7a63);
+  border-color: #1d7a63;
   color: #fff
 }
 
 .check-option b {
   margin-left: auto;
   color: #70818a;
-  font-size: 10px
+  font-size: 10.5px;
+  font-weight: 800
 }
 
 .quote-section textarea {
-  margin: 12px 16px 8px;
-  width: calc(100% - 32px);
+  margin: 14px 18px 0;
+  width: calc(100% - 36px);
   resize: vertical
 }
 
 .upload-box {
-  margin: 0 16px 12px;
-  min-height: 70px;
+  margin: 12px 18px 16px;
+  min-height: 78px;
   border: 1px dashed #a9c6bd;
-  border-radius: 6px;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 4px;
   color: #328f77;
-  background: #f6fbf9
+  background: linear-gradient(180deg, #f8fcfb, #f2f9f6);
+  transition: border-color .15s ease, background .15s ease
+}
+
+.upload-box:hover {
+  border-color: #1d7a63;
+  background: #f2f9f6
 }
 
 .upload-box input {
@@ -2663,17 +2744,18 @@ td small {
 }
 
 .upload-box b {
-  font-size: 11px;
-  color: #476760
+  font-size: 11.5px;
+  color: #476760;
+  margin-top: 2px
 }
 
 .upload-box span {
-  font-size: 9px;
+  font-size: 9.5px;
   color: #91a19f
 }
 
 .price-card {
-  padding: 15px
+  padding: 16px
 }
 
 .side-kicker {
@@ -2910,9 +2992,9 @@ td small {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 0;
+  padding: 7px 0;
   color: #718087;
-  font-size: 10px
+  font-size: 10.5px
 }
 
 .summary-lines b {
@@ -2926,11 +3008,13 @@ td small {
 }
 
 .summary-lines input {
-  width: 33px;
+  width: 40px;
+  height: 24px;
   border: 1px solid #d5e1e2;
-  border-radius: 3px;
+  border-radius: 6px;
   color: #2d8d75;
-  text-align: center
+  text-align: center;
+  font-size: 10.5px
 }
 
 .summary-lines .line-strong {
@@ -3024,18 +3108,20 @@ td small {
 }
 
 .terms-list {
-  padding: 5px 16px
+  padding: 6px 18px
 }
 
 .terms-list p {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 20px;
   border-bottom: 1px solid #eef2f3;
-  padding: 7px 0;
+  padding: 9px 0;
   margin: 0;
   color: #536871;
-  font-size: 10px
+  font-size: 10.5px;
+  font-weight: 600
 }
 
 .terms-list p:last-child {
@@ -3071,11 +3157,12 @@ td small {
 }
 
 .lead-time input[type=number] {
-  width: 48px;
-  padding: 5px 6px;
+  width: 56px;
+  height: 36px;
+  padding: 0 6px;
   border: 1px solid #d5e1e2;
-  border-radius: 6px;
-  font-size: 11px;
+  border-radius: 8px;
+  font-size: 12px;
   font-weight: 700;
   color: #2d3a40;
   text-align: center;
@@ -3083,12 +3170,14 @@ td small {
 }
 
 .lead-time select {
-  font-size: 10.5px;
-  padding: 5px 4px;
+  font-size: 11.5px;
+  height: 36px;
+  padding: 0 8px;
   border: 1px solid #d5e1e2;
-  border-radius: 6px;
+  border-radius: 8px;
   background: #fff;
-  color: #334c56
+  color: #334c56;
+  cursor: pointer
 }
 
 .lead-time input:focus,
@@ -3894,6 +3983,114 @@ th.sortable span {
     width: 100%;
     min-width: 0
   }
+}
+
+/* Plano 2D / 3D del mueble */
+.plan-tabs {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+  margin: 14px 18px 12px;
+}
+
+.plan-tabs button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 1;
+  padding: 12px 14px;
+  font-size: 13.5px;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  color: #5b6b74;
+  background: #f5f8f7;
+  border: 1px solid #d3dce2;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all .18s ease;
+}
+
+.plan-tabs button:hover {
+  border-color: #92b8ad;
+  color: #1d7a63;
+}
+
+.plan-tabs button.active {
+  background: linear-gradient(160deg, #2f9d81, #1d7a63);
+  border-color: #1d7a63;
+  color: #fff;
+  box-shadow: 0 6px 18px -8px rgba(29, 122, 99, .55);
+}
+
+.plan-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  background: rgba(255, 255, 255, .2);
+  border: 1px solid rgba(255, 255, 255, .45);
+}
+
+.plan-tabs .iso-toolbar {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.plan-tabs .iso-toolbar button {
+  flex: none;
+  padding: 0 13px;
+  font-size: 15px;
+  background: #ffffff;
+}
+
+.plan-tabs .iso-toolbar button:hover {
+  border-color: #1d7a63;
+  color: #1d7a63;
+}
+
+.plan-wrap {
+  background: #fff;
+  border: 1px solid #dfe7ec;
+  border-radius: 10px;
+  padding: 14px 14px 10px;
+}
+
+.plan-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.plan-svg text {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.plan-legend {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  font-size: 11px;
+  color: #52636d;
+}
+
+.plan-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.plan-legend i {
+  width: 13px;
+  height: 13px;
+  border-radius: 3px;
+  display: inline-block;
 }
 
 @media print {

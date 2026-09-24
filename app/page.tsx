@@ -78,6 +78,482 @@ type LeadUnit = 'día' | 'semana' | 'mes';
 const leadPlural: Record<LeadUnit, string> = { día: 'días', semana: 'semanas', mes: 'meses' };
 function LeadTime({ qty, unit, onQty, onUnit }: { qty: string; unit: LeadUnit; onQty: (v: string) => void; onUnit: (u: LeadUnit) => void }) { return <span className="lead-time"><input type="number" min="1" value={qty} onChange={e => onQty(e.target.value)} /><select value={unit} onChange={e => onUnit(e.target.value as LeadUnit)}><option value="día">Días</option><option value="semana">Semanas</option><option value="mes">Meses</option></select></span> }
 
+function FurniturePlan({ dimensions, material, selected }: {
+  dimensions: { width: string; height: string; depth: string };
+  material: typeof products[number];
+  selected: { drawers: boolean; handles: boolean; led: boolean; hinges: boolean };
+}) {
+  const W = Math.max(40, moneyInput(dimensions.width));
+  const H = Math.max(40, moneyInput(dimensions.height));
+  const D = Math.max(30, moneyInput(dimensions.depth));
+  const sw = material.swatch && material.swatch.startsWith('#') ? material.swatch : '#c9a27a';
+  const ink = '#17232d';
+  const dark = '#33444f';
+  const accent = '#1d7a63';
+  const metal = '#8ea0ac';
+
+  const hx = (v: string) => { const n = parseInt(v.slice(1), 16); const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255; return (ch: number, s: number) => '#' + [r + 255 * s, g + 255 * s + 20 * ch, b + 255 * s - 30 * ch].map(c => Math.round(Math.min(255, Math.max(0, c))).toString(16).padStart(2, '0')).join(''); };
+  const tone = hx(sw);
+  const cLight = tone(0, 0.16);
+  const cBase = tone(0, 0);
+  const cDeep = tone(0, -0.16);
+  const cDark = tone(0, -0.3);
+
+  const sf = Math.min(430 / W, 480 / H);
+  const fw = W * sf, fh = H * sf;
+  const fx = 250 - fw / 2, fy = 350 - fh / 2;
+  const ct = Math.max(16, fh * 0.07);
+  const ledH = selected.led ? Math.max(10, fh * 0.05) : 0;
+  const drawersH = selected.drawers ? Math.max(30, fh * 0.34) : 0;
+  const doorY = fy + ct + ledH + drawersH;
+  const doorH = fy + fh - doorY;
+
+  const ss = Math.min(280 / D, 230 / H);
+  const sideW = D * ss, sideH = H * ss;
+  const sx = 770 - sideW / 2, sy = 175 - sideH / 2;
+
+  const st = Math.min(270 / W, 235 / D);
+  const topW = W * st, topH = D * st;
+  const tx = 770 - topW / 2, ty = 505 - topH / 2;
+
+  const bevel = (x: number, y: number, w: number, h: number) => (
+    <g pointerEvents="none">
+      <rect x={x} y={y} width={w} height={Math.max(2, h * 0.03)} fill="#ffffff" opacity={0.3} />
+      <rect x={x} y={y + h - Math.max(2, h * 0.03)} width={w} height={Math.max(2, h * 0.03)} fill="#000000" opacity={0.12} />
+      <rect x={x} y={y} width={Math.max(2, w * 0.02)} height={h} fill="#ffffff" opacity={0.22} />
+      <rect x={x + w - Math.max(2, w * 0.02)} y={y} width={Math.max(2, w * 0.02)} height={h} fill="#000000" opacity={0.1} />
+    </g>
+  );
+
+  const HL = ({ x1, x2, y, label }: { x1: number; x2: number; y: number; label: string }) => (
+    <g>
+      <line x1={x1} y1={y} x2={x2} y2={y} stroke="#33444f" strokeWidth={1.3} />
+      <line x1={x1} y1={y - 5} x2={x1} y2={y + 5} stroke="#33444f" strokeWidth={1.3} />
+      <line x1={x2} y1={y - 5} x2={x2} y2={y + 5} stroke="#33444f" strokeWidth={1.3} />
+      <rect x={(x1 + x2) / 2 - 36} y={y - 21} width={72} height={17} rx={4} fill="#ffffff" stroke="#d3dce2" />
+      <text x={(x1 + x2) / 2} y={y - 9} textAnchor="middle" fontSize={12.5} fontWeight={700} fill={ink}>{label}</text>
+    </g>
+  );
+  const VL = ({ y1, y2, x, label }: { y1: number; y2: number; x: number; label: string }) => {
+    const mid = (y1 + y2) / 2;
+    return (
+      <g>
+        <line x1={x} y1={y1} x2={x} y2={y2} stroke="#33444f" strokeWidth={1.3} />
+        <line x1={x - 5} y1={y1} x2={x + 5} y2={y1} stroke="#33444f" strokeWidth={1.3} />
+        <line x1={x - 5} y1={y2} x2={x + 5} y2={y2} stroke="#33444f" strokeWidth={1.3} />
+        <g transform={`rotate(-90 ${x} ${mid})`}>
+          <rect x={x - 36} y={mid - 8.5} width={72} height={17} rx={4} fill="#ffffff" stroke="#d3dce2" />
+          <text x={x} y={mid + 4} textAnchor="middle" fontSize={12.5} fontWeight={700} fill={ink}>{label}</text>
+        </g>
+      </g>
+    );
+  };
+  const CAPT = ({ x, y, t }: { x: number; y: number; t: string }) => (
+    <g>
+      <text x={x} y={y} textAnchor="middle" fontSize={17} fontWeight={800} fill={ink}>{t}</text>
+      <rect x={x - 34} y={y + 7} width={68} height={3} rx={1.5} fill={accent} />
+    </g>
+  );
+
+  return (
+    <div className="plan-wrap">
+      <svg viewBox="0 0 1000 700" className="plan-svg" role="img" aria-label="Plano de fabricación del mueble a medida">
+        <defs>
+          <pattern id="plan-grid" width="100" height="100" patternUnits="userSpaceOnUse">
+            <path d="M100 0 H0 V100" fill="none" stroke="#e7edf0" strokeWidth="1" />
+          </pattern>
+          <pattern id="plan-grain" width="70" height="70" patternUnits="userSpaceOnUse" patternTransform="rotate(14)">
+            <path d="M0 18 Q 18 10 38 16 T 70 14" stroke={cDark} strokeWidth="1.1" fill="none" opacity="0.18" />
+            <path d="M0 40 Q 20 32 42 38 T 70 36" stroke={cDark} strokeWidth="1.3" fill="none" opacity="0.15" />
+            <path d="M0 62 Q 18 54 40 60 T 70 58" stroke={cDark} strokeWidth="0.9" fill="none" opacity="0.16" />
+            <ellipse cx="52" cy="16" rx="3.2" ry="1.7" fill={cDark} opacity="0.2" />
+            <ellipse cx="16" cy="48" rx="2.6" ry="1.5" fill={cDark} opacity="0.16" />
+          </pattern>
+          <linearGradient id="gWood" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor={cLight} />
+            <stop offset="0.08" stopColor={cBase} />
+            <stop offset="0.96" stopColor={cDeep} />
+            <stop offset="1" stopColor={cDark} />
+          </linearGradient>
+          <linearGradient id="gFront" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor={cLight} />
+            <stop offset="0.18" stopColor={cBase} />
+            <stop offset="1" stopColor={cDeep} />
+          </linearGradient>
+          <linearGradient id="gCounter" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor={cLight} />
+            <stop offset="0.35" stopColor={cBase} />
+            <stop offset="1" stopColor={cDark} />
+          </linearGradient>
+          <linearGradient id="gMetal" x1="0" y1="0" x2="1" y2="0.4">
+            <stop offset="0" stopColor="#f2f5f7" />
+            <stop offset="0.45" stopColor="#b6c1ca" />
+            <stop offset="0.55" stopColor="#8798a3" />
+            <stop offset="1" stopColor="#edf1f4" />
+          </linearGradient>
+          <linearGradient id="gLED" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#fff7d6" />
+            <stop offset="0.5" stopColor="#ffe08a" />
+            <stop offset="1" stopColor="#ffd465" />
+          </linearGradient>
+          <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodColor="#17232d" floodOpacity="0.18" />
+          </filter>
+        </defs>
+
+        <rect x={24} y={24} width={952} height={652} rx={4} fill="#ffffff" stroke={dark} strokeWidth={2.5} />
+        <rect x={30} y={30} width={940} height={640} rx={2} fill="url(#plan-grid)" opacity={0.6} stroke="#d3dce2" strokeWidth="1" />
+
+        <g>
+          <rect x={30} y={32} width={266} height={40} rx={3} fill="#f5f8f7" stroke="#d3dce2" strokeWidth="1" filter="url(#soft)" />
+          <text x={44} y={48} fontSize={15} fontWeight={800} fill={accent}>MODIRU MUEBLES</text>
+          <text x={44} y={66} fontSize={11.5} fill="#5b6b74" letterSpacing="1.5">PLANO DE FABRICACIÓN</text>
+          <rect x={296} y={36} width={14} height={28} rx={3} fill={accent} opacity={0.9} />
+          <text x={303} y={46} fontSize={12} fontWeight={800} fill="#fff" textAnchor="middle">S</text>
+          <text x={303} y={59} fontSize={12} fontWeight={800} fill="#fff" textAnchor="middle">C</text>
+          <text x={316} y={53} fontSize={11} fill="#5b6b74">Escala gráfica aproximada · cm</text>
+        </g>
+
+        <CAPT x={250} y={104} t="VISTA FRONTAL" />
+        <g>
+          <rect x={fx + 5} y={fy + fh + 3} width={fw} height={5} rx={2.5} fill="#17232d" opacity={0.12} />
+          <rect x={fx} y={fy} width={fw} height={fh} rx={2.5} fill="url(#gWood)" stroke={dark} strokeWidth={2.5} />
+          <rect x={fx + 2} y={fy + 2} width={fw - 4} height={fh - 4} rx={2} fill="url(#plan-grain)" />
+          <rect x={fx} y={fy} width={fw} height={ct} rx={2.5} fill="url(#gCounter)" stroke={dark} strokeWidth={2} />
+          <rect x={fx + 2.5} y={fy + 2} width={fw - 5} height={3} rx={1.5} fill="#ffffff" opacity={0.35} />
+          {selected.led && (
+            <g>
+              <rect x={fx + 3} y={fy + ct} width={fw - 6} height={ledH} rx={1.5} fill="url(#gLED)" stroke="#d9a520" strokeWidth={1} />
+              <rect x={fx + 3} y={fy + ct} width={fw - 6} height={2.5} fill="#ffffff" opacity={0.4} />
+              <text x={fx + fw / 2} y={fy + ct + ledH - 2.5} textAnchor="middle" fontSize={10.5} fontWeight={800} fill="#6b5a00" letterSpacing="1">LED</text>
+            </g>
+          )}
+          {drawersH > 0 && (
+            <g>
+              {[0, 1].map(i => {
+                const dy = fy + ct + ledH + drawersH * i * 0.5;
+                const dh = drawersH / 2 - 2;
+                return (
+                  <g key={i}>
+                    <rect x={fx + 2} y={dy} width={fw - 4} height={dh} rx={2.5} fill="url(#gFront)" stroke={dark} strokeWidth={1.4} filter="url(#soft)" />
+                    <rect x={fx + 2} y={dy} width={fw - 4} height={dh} rx={2.5} fill="url(#plan-grain)" />
+                    {bevel(fx + 2, dy, fw - 4, dh)}
+                    <line x1={fx + 2} y1={dy + dh} x2={fx + fw - 2} y2={dy + dh} stroke="#000000" opacity={0.16} strokeWidth={1.2} />
+                    {selected.handles && (
+                      <rect x={fx + fw / 2 - 27} y={dy + dh / 2 - 3.5} width={54} height={7} rx={3.5} fill="url(#gMetal)" stroke={metal} strokeWidth={0.8} />
+                    )}
+                  </g>
+                );
+              })}
+            </g>
+          )}
+          {doorH > 0 && (
+            <g>
+              {[0, 1].map(i => {
+                const dx = fx + (fw / 2) * i;
+                const dw = fw / 2 - 2;
+                return (
+                  <g key={i}>
+                    <rect x={dx + 1.5} y={doorY} width={dw} height={doorH} rx={2.5} fill="url(#gFront)" stroke={dark} strokeWidth={1.4} filter="url(#soft)" />
+                    <rect x={dx + 1.5} y={doorY} width={dw} height={doorH} rx={2.5} fill="url(#plan-grain)" />
+                    {bevel(dx + 1.5, doorY, dw, doorH)}
+                    {selected.handles && (
+                      <rect x={dx + (i === 0 ? dw - 30 : 24)} y={doorY + doorH / 2 - 16} width={6} height={32} rx={3} fill="url(#gMetal)" stroke={metal} strokeWidth={0.8} />
+                    )}
+                  </g>
+                );
+              })}
+              <line x1={fx + fw / 2} y1={doorY} x2={fx + fw / 2} y2={doorY + doorH} stroke="#000000" opacity={0.15} strokeWidth={1.6} />
+              {selected.hinges && [0.18, 0.5, 0.82].map(t => (
+                <g key={t}>
+                  <rect x={fx - 2} y={doorY + doorH * t - 3} width={7} height={10} rx={2} fill="url(#gMetal)" stroke={metal} strokeWidth={0.8} />
+                  <rect x={fx + fw - 5} y={doorY + doorH * t - 3} width={7} height={10} rx={2} fill="url(#gMetal)" stroke={metal} strokeWidth={0.8} />
+                </g>
+              ))}
+            </g>
+          )}
+          <HL x1={fx} x2={fx + fw} y={fy - 40} label={`${W} cm`} />
+          <VL y1={fy} y2={fy + fh} x={fx - 42} label={`${H} cm`} />
+        </g>
+
+        <CAPT x={770} y={104} t="VISTA LATERAL" />
+        <g>
+          <rect x={sx + 5} y={sy + sideH + 3} width={sideW} height={5} rx={2.5} fill="#17232d" opacity={0.12} />
+          <rect x={sx} y={sy} width={sideW} height={sideH} rx={2.5} fill="url(#gWood)" stroke={dark} strokeWidth={2.5} />
+          <rect x={sx} y={sy + sideH - Math.max(11, sideH * 0.05)} width={sideW} height={Math.max(11, sideH * 0.05)} rx={2} fill={accent} stroke={dark} strokeWidth={1.4} />
+          <rect x={sx + 2} y={sy + 2} width={sideW - 4} height={sideH - 4} rx={2} fill="url(#plan-grain)" />
+          <rect x={sx + sideW - sideW * 0.055} y={sy} width={sideW * 0.055} height={sideH} fill={cDeep} opacity={0.65} />
+          <line x1={sx + sideW * 0.5} y1={sy + sideH * 0.18} x2={sx + sideW * 0.5} y2={sy + sideH * 0.92} stroke={cDark} strokeWidth={1.8} opacity={0.7} />
+          <rect x={sx + sideW * 0.5 - 3} y={sy + sideH * 0.18} width={6} height={sideH * 0.74} fill="url(#gFront)" stroke={dark} strokeWidth={0.8} opacity={0.9} />
+          {selected.led && <rect x={sx + sideW * 0.06} y={sy + sideH * 0.11} width={sideW * 0.5} height={6} rx={1} fill="url(#gLED)" stroke="#d9a520" strokeWidth={0.8} />}
+          <HL x1={sx} x2={sx + sideW} y={sy - 34} label={`${D} cm`} />
+          <VL y1={sy} y2={sy + sideH} x={sx - 40} label={`${H} cm`} />
+        </g>
+
+        <CAPT x={770} y={366} t="PLANTA" />
+        <g>
+          <rect x={tx} y={ty} width={topW} height={topH} rx={3} fill="url(#gWood)" stroke={dark} strokeWidth={2.5} />
+          <rect x={tx + 5} y={ty + 5} width={topW - 10} height={topH - 10} rx={2} fill="url(#plan-grain)" />
+          <rect x={tx + 3} y={ty + 3} width={topW - 6} height={3} rx={1.5} fill="#ffffff" opacity={0.3} />
+          <rect x={tx + 3} y={ty + topH - 6} width={topW - 6} height={3} rx={1.5} fill="#000000" opacity={0.14} />
+          {selected.led && (
+            <g>
+              <rect x={tx + 4} y={ty + 5} width={topW - 8} height={Math.max(9, topH * 0.1)} rx={1.5} fill="url(#gLED)" stroke="#d9a520" strokeWidth={1} />
+              <text x={tx + 6} y={ty + 11} fontSize={8} fill="#8a6d00">LED</text>
+            </g>
+          )}
+          {selected.handles && (
+            <g>
+              <rect x={tx + topW / 2 - 4} y={ty + topH / 2 - 18} width={8} height={14} rx={2} fill="url(#gMetal)" stroke={metal} strokeWidth={0.8} />
+              <rect x={tx + topW / 2 + 5} y={ty + topH / 2 - 18} width={8} height={14} rx={2} fill="url(#gMetal)" stroke={metal} strokeWidth={0.8} />
+            </g>
+          )}
+          <HL x1={tx} x2={tx + topW} y={ty + topH + 32} label={`${W} cm`} />
+          <VL y1={ty} y2={ty + topH} x={tx - 40} label={`${D} cm`} />
+        </g>
+
+        <g>
+          <text x={46} y={660} fontSize={12} fontWeight={700} fill={ink}>MEDIDAS</text>
+          <text x={112} y={660} fontSize={12} fill="#5b6b74">{W} × {D} × {H} cm (Ancho × Fondo × Alto)</text>
+          <text x={652} y={660} fontSize={12} fontWeight={700} fill={ink}>MATERIAL</text>
+          <text x={716} y={660} fontSize={12} fill="#5b6b74">{material.name} · {material.brand}</text>
+        </g>
+      </svg>
+      <div className="plan-legend">
+        <span><i style={{ background: sw, border: '1px solid #33444f' }} />Melamina {material.name}</span>
+        <span><i style={{ background: '#ffe08a', border: '1px solid #d9a520' }} />Iluminación LED</span>
+        <span><i style={{ background: dark }} />Estructura / tapacanto</span>
+        <span><i style={{ background: accent }} />Zócalo</span>
+        <span><i style={{ background: '#c9b08c', border: '1px solid #33444f' }} />Veteado natural</span>
+      </div>
+    </div>
+  );
+}
+
+function FurnitureIso({ dimensions, material, selected, rot }: {
+  dimensions: { width: string; height: string; depth: string };
+  material: typeof products[number];
+  selected: { drawers: boolean; handles: boolean; led: boolean; hinges: boolean };
+  rot: number;
+}) {
+  const W = Math.max(40, moneyInput(dimensions.width));
+  const H = Math.max(40, moneyInput(dimensions.height));
+  const D = Math.max(30, moneyInput(dimensions.depth));
+  const sw = material.swatch && material.swatch.startsWith('#') ? material.swatch : '#c9a27a';
+  const ink = '#17232d';
+  const dark = '#33444f';
+  const accent = '#1d7a63';
+
+  const tone = (pct: number) => '#' + sw.slice(1).match(/../g)!.map(h => Math.round(Math.min(255, Math.max(0, parseInt(h, 16) * (1 + pct)))).toString(16).padStart(2, '0')).join('');
+  const cLight = tone(0.18), cBase = sw, cDeep = tone(-0.16), cDark = tone(-0.3);
+
+  const rad = ((rot % 360) * Math.PI) / 180;
+  const cs = Math.cos(rad), sn = Math.sin(rad);
+  const rv = (x: number, y: number) => [x * cs - y * sn, x * sn + y * cs] as [number, number];
+  const ex = rv(0.8660254, 0.5);
+  const ey = rv(-0.8660254, 0.5);
+
+  const corners: [number, number, number][] = [[0, 0, 0], [W, 0, 0], [W, D, 0], [0, D, 0], [0, 0, H], [W, 0, H], [W, D, H], [0, D, H]];
+  const raw = corners.map(c => [ex[0] * c[0] + ey[0] * c[1], ex[1] * c[0] + ey[1] * c[1] - c[2]]);
+  const xs = raw.map(p => p[0]), ys = raw.map(p => p[1]);
+  const spanX = Math.max(...xs) - Math.min(...xs);
+  const spanY = Math.max(...ys) - Math.min(...ys);
+  const scl = Math.min(500 / spanX, 440 / spanY);
+  const proj = (x: number, y: number, z: number) => [(ex[0] * x + ey[0] * y) * scl, (ex[1] * x + ey[1] * y - z) * scl] as [number, number];
+  const projPts = corners.map(c => proj(c[0], c[1], c[2]));
+  const cx0 = (Math.min(...projPts.map(p => p[0])) + Math.max(...projPts.map(p => p[0]))) / 2;
+  const cy0 = (Math.min(...projPts.map(p => p[1])) + Math.max(...projPts.map(p => p[1]))) / 2;
+
+  const visX = ex[1] >= 0;
+  const visY = ey[1] >= 0;
+  const xf = visX ? W : 0;
+  const yf = visY ? D : 0;
+  const bkY = visY ? 0 : D;
+
+  const ctM = Math.max(6, H * 0.08);
+  const ledM = selected.led ? Math.max(5, H * 0.05) : 0;
+  const drM = selected.drawers ? Math.max(12, H * 0.34) : 0;
+  const dLow = Math.max(0, H - ctM - ledM - drM);
+  const plM = Math.max(4, H * 0.05);
+
+  const P = (x: number, y: number, z: number) => proj(x, y, z).map(n => n.toFixed(1)).join(',');
+  const q = (pts: [number, number, number][], fill: string, sw = 1.4, op = 1) => (
+    <polygon points={pts.map(p => P(p[0], p[1], p[2])).join(' ')} fill={fill} stroke={dark} strokeWidth={sw} strokeLinejoin="round" opacity={op} />
+  );
+  const line = (a: [number, number, number], b: [number, number, number], stroke: string, w: number) => (
+    <line x1={P(a[0], a[1], a[2]).split(',')[0]} y1={P(a[0], a[1], a[2]).split(',')[1]} x2={P(b[0], b[1], b[2]).split(',')[0]} y2={P(b[0], b[1], b[2]).split(',')[1]} stroke={stroke} strokeWidth={w} strokeLinecap="round" />
+  );
+  const IsoDim = ({ a, b, label, vertical = false }: { a: [number, number, number]; b: [number, number, number]; label: string; vertical?: boolean }) => {
+    const A = proj(a[0], a[1], a[2]), B = proj(b[0], b[1], b[2]);
+    const dx = B[0] - A[0], dy = B[1] - A[1];
+    let ux: number, uy: number;
+    if (vertical) {
+      ux = A[0] >= 0 ? 1 : -1;
+      uy = 0;
+    } else {
+      const up = (dy !== 0 || dx !== 0) ? ([-dy, dx] as [number, number]) : ([0, -1] as [number, number]);
+      ux = up[1] <= 0 ? up[0] : -up[0];
+      uy = up[1] <= 0 ? up[1] : -up[1];
+    }
+    const len = Math.hypot(ux, uy) || 1;
+    ux /= len; uy /= len;
+    const off = 34;
+    const mx = (A[0] + B[0]) / 2, my = (A[1] + B[1]) / 2;
+    const tx = mx + ux * off, ty = my + uy * off;
+    return (
+      <g>
+        <line x1={A[0]} y1={A[1]} x2={B[0]} y2={B[1]} stroke="#33444f" strokeWidth={1.3} />
+        <circle cx={A[0]} cy={A[1]} r={2.4} fill="#ffffff" stroke="#33444f" strokeWidth={1.2} />
+        <circle cx={B[0]} cy={B[1]} r={2.4} fill="#ffffff" stroke="#33444f" strokeWidth={1.2} />
+        <rect x={tx - 35} y={ty - 9.5} width={70} height={17} rx={4} fill="#ffffff" stroke="#d3dce2" />
+        <text x={tx} y={ty + 4} textAnchor="middle" fontSize={12} fontWeight={700} fill={ink}>{label}</text>
+      </g>
+    );
+  };
+
+  return (
+    <svg viewBox="0 0 1000 700" className="plan-svg" role="img" aria-label="Vista 3D del mueble a medida">
+      <defs>
+        <pattern id="isoGrid" width="100" height="100" patternUnits="userSpaceOnUse">
+          <path d="M100 0 H0 V100" fill="none" stroke="#e7edf0" strokeWidth="1" />
+        </pattern>
+        <pattern id="isoGrain" width="70" height="70" patternUnits="objectBoundingBox">
+          <path d="M0 18 Q 18 10 38 16 T 70 14" stroke={cDark} strokeWidth="1.1" fill="none" opacity="0.2" />
+          <path d="M0 40 Q 20 32 42 38 T 70 36" stroke={cDark} strokeWidth="1.3" fill="none" opacity="0.16" />
+          <ellipse cx="52" cy="16" rx="3" ry="1.6" fill={cDark} opacity="0.2" />
+        </pattern>
+        <linearGradient id="isoWood" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor={cLight} />
+          <stop offset="0.12" stopColor={cBase} />
+          <stop offset="0.95" stopColor={cDeep} />
+          <stop offset="1" stopColor={cDark} />
+        </linearGradient>
+        <linearGradient id="isoCounter" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor={cLight} />
+          <stop offset="0.3" stopColor={cBase} />
+          <stop offset="1" stopColor={cDark} />
+        </linearGradient>
+        <linearGradient id="isoMetal" x1="0" y1="0" x2="1" y2="0.4">
+          <stop offset="0" stopColor="#f2f5f7" />
+          <stop offset="0.45" stopColor="#b6c1ca" />
+          <stop offset="0.55" stopColor="#8798a3" />
+          <stop offset="1" stopColor="#edf1f4" />
+        </linearGradient>
+        <linearGradient id="isoLED" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#fff7d6" />
+          <stop offset="1" stopColor="#ffd465" />
+        </linearGradient>
+      </defs>
+
+      <rect x={24} y={24} width={952} height={652} rx={4} fill="#ffffff" stroke={dark} strokeWidth={2.5} />
+      <rect x={30} y={30} width={940} height={640} rx={2} fill="url(#isoGrid)" opacity={0.6} stroke="#d3dce2" strokeWidth="1" />
+
+      <text x={500} y={64} textAnchor="middle" fontSize={17} fontWeight={800} fill={ink}>VISTA 3D ISOMÉTRICA</text>
+      <text x={500} y={82} textAnchor="middle" fontSize={11.5} fill="#5b6b74">Gira el mueble con los botones · medidas actualizadas en tiempo real</text>
+
+      <g transform={`translate(${500 - cx0} ${345 - cy0})`}>
+        {q([[xf, 0, 0], [xf, D, 0], [xf, D, H], [xf, 0, H]], 'url(#isoWood)', 1.4)}
+        <polygon points={`${P(xf, 0, 0)} ${P(xf, D, 0)} ${P(xf, D, H)} ${P(xf, 0, H)}`} fill="url(#isoGrain)" />
+        <polygon points={`${P(xf, bkY, 0)} ${P(xf, bkY + Math.max(0.35, D * 0.02), 0)} ${P(xf, bkY + Math.max(0.35, D * 0.02), H)} ${P(xf, bkY, H)}`} fill={cDeep} opacity={0.5} />
+        {q([[xf, 0, H], [xf, D, H], [xf, D, H - ctM], [xf, 0, H - ctM]], 'url(#isoCounter)', 1.4)}
+        {q([[xf, 0, 0], [xf, D, 0], [xf, D, plM], [xf, 0, plM]], accent, 1.2)}
+
+        {q([[0, yf, 0], [W, yf, 0], [W, yf, H], [0, yf, H]], 'url(#isoWood)', 1.4)}
+        <polygon points={`${P(0, yf, 0)} ${P(W, yf, 0)} ${P(W, yf, H)} ${P(0, yf, H)}`} fill="url(#isoGrain)" />
+        {q([[0, yf, H], [W, yf, H], [W, yf, H - ctM], [0, yf, H - ctM]], 'url(#isoCounter)', 1.4)}
+        {q([[0, yf, 0], [W, yf, 0], [W, yf, plM], [0, yf, plM]], accent, 1.2)}
+
+        {selected.led && ledM > 0 && q([[0, yf, H - ctM], [W, yf, H - ctM], [W, yf, H - ctM - ledM], [0, yf, H - ctM - ledM]], 'url(#isoLED)', 1.2)}
+        {selected.led && <polygon points={`${P(0, yf, H - ctM)} ${P(W, yf, H - ctM)} ${P(W, yf, H - ctM - ledM)} ${P(0, yf, H - ctM - ledM)}`} fill="#ffffff" opacity={0.25} />}
+
+        {drM > 0 && (
+          <g>
+            {[0, 1].map(i => {
+              const zm = H - ctM - ledM - drM / 2 * (i + 1);
+              const zt = H - ctM - ledM - drM / 2 * i;
+              const ym = yf;
+              return (
+                <g key={i}>
+                  {q([[0, ym, zt], [W, ym, zt], [W, ym, zm], [0, ym, zm]], 'url(#isoWood)', 1.2)}
+                  {selected.handles && line([W / 2 - 22, ym, (zt + zm) / 2], [W / 2 + 22, ym, (zt + zm) / 2], 'url(#isoMetal)', 5)}
+                </g>
+              );
+            })}
+          </g>
+        )}
+        {dLow > 0 && (
+          <g>
+            {q([[0, yf, dLow], [W / 2, yf, dLow], [W / 2, yf, 0], [0, yf, 0]], 'url(#isoWood)', 1.2)}
+            {q([[W / 2, yf, dLow], [W, yf, dLow], [W, yf, 0], [W / 2, yf, 0]], 'url(#isoWood)', 1.2)}
+            {line([W / 2, yf, dLow], [W / 2, yf, 0], cDark, 1.6)}
+            {selected.handles && (
+              <g>
+                {line([W / 2 - 4, yf, dLow * 0.72], [W / 2 - 4, yf, dLow * 0.28], 'url(#isoMetal)', 5)}
+                {line([W / 2 + 4, yf, dLow * 0.72], [W / 2 + 4, yf, dLow * 0.28], 'url(#isoMetal)', 5)}
+              </g>
+            )}
+            {selected.hinges && [0.25, 0.5, 0.75].map(t => (
+              <g key={t}>
+                <circle cx={Number(P(0, yf, dLow * t).split(',')[0])} cy={Number(P(0, yf, dLow * t).split(',')[1])} r={2.6} fill={cDark} />
+                <circle cx={Number(P(W, yf, dLow * t).split(',')[0])} cy={Number(P(W, yf, dLow * t).split(',')[1])} r={2.6} fill={cDark} />
+              </g>
+            ))}
+          </g>
+        )}
+        <polygon points={`${P(0, 0, H)} ${P(W, 0, H)} ${P(W, D, H)} ${P(0, D, H)}`} fill={cBase} stroke={dark} strokeWidth={1.6} />
+        <polygon points={`${P(0, 0, H)} ${P(W, 0, H)} ${P(W, D, H)} ${P(0, D, H)}`} fill="url(#isoGrain)" />
+        <polygon points={`${P(0, 0, H)} ${P(W, 0, H)} ${P(W, D, H)} ${P(0, D, H)}`} fill={cLight} opacity={0.16} />
+        <polygon points={`${P(2, 0, H)} ${P(W - 2, 0, H)} ${P(W - 2, D, H)} ${P(2, D, H)}`} fill="none" stroke={cDark} strokeWidth={0.8} opacity={0.8} />
+        {selected.led && (
+          <g>
+            {line([2, yf, H - 0.5], [W - 2, yf, H - 0.5], '#ffd465', 5)}
+            {line([2, yf, H - 2], [W - 2, yf, H - 2], '#fff3c4', 3)}
+          </g>
+        )}
+
+        <IsoDim a={[0, yf, H]} b={[W, yf, H]} label={`${W} cm`} />
+        <IsoDim a={[xf, 0, H]} b={[xf, D, H]} label={`${D} cm`} />
+        <IsoDim a={[0, yf, 0]} b={[0, yf, H]} label={`${H} cm`} />
+      </g>
+
+      <g>
+        <text x={46} y={660} fontSize={12} fontWeight={700} fill={ink}>MEDIDAS</text>
+        <text x={112} y={660} fontSize={12} fill="#5b6b74">{W} × {D} × {H} cm (Ancho × Fondo × Alto)</text>
+        <text x={652} y={660} fontSize={12} fontWeight={700} fill={ink}>MATERIAL</text>
+        <text x={716} y={660} fontSize={12} fill="#5b6b74">{material.name} · {material.brand}</text>
+      </g>
+    </svg>
+  );
+}
+
+function PlanView({ dimensions, material, selected }: {
+  dimensions: { width: string; height: string; depth: string };
+  material: typeof products[number];
+  selected: { drawers: boolean; handles: boolean; led: boolean; hinges: boolean };
+}) {
+  const [mode, setMode] = useState<'2d' | '3d'>('3d');
+  const [rot, setRot] = useState(0);
+  return (
+    <div>
+      <div className="plan-tabs">
+        <button className={mode === '3d' ? 'active' : ''} onClick={() => setMode('3d')}><Cuboid size={16} /> Vista 3D<span className="plan-tag">3D</span></button>
+        <button className={mode === '2d' ? 'active' : ''} onClick={() => setMode('2d')}><Ruler size={16} /> Plano 2D</button>
+        {mode === '3d' && (
+          <span className="iso-toolbar">
+            <button onClick={() => setRot(r => r - 90)}><Move size={14} /> ⟲</button>
+            <button onClick={() => setRot(r => r + 90)}>⟳</button>
+          </span>
+        )}
+      </div>
+      {mode === '2d' ? (
+        <FurniturePlan dimensions={dimensions} material={material} selected={selected} />
+      ) : (
+        <FurnitureIso dimensions={dimensions} material={material} selected={selected} rot={rot} />
+      )}
+    </div>
+  );
+}
+
 function PdfTemplate({ client, material, dimensions, calc, notes, selected, meta, overrideTotal }: {
   client: typeof customers[number];
   material: typeof products[number];
@@ -538,7 +1014,10 @@ function Quoter({ customers, onAddCustomer }: { customers: Customer[]; onAddCust
               <span className="auto-price">{calc.area.toFixed(2)} m²</span>
             </div>
           </Section>
-          <Section number="05" icon={SlidersHorizontal} title="Herrajes y accesorios" detail="Selecciona los complementos del proyecto">
+          <Section number="05" icon={Ruler} title="Plano del mueble" detail="Vista referencial 2D/3D con medidas según tu configuración">
+            <PlanView dimensions={dimensions} material={material} selected={selected} />
+          </Section>
+          <Section number="06" icon={SlidersHorizontal} title="Herrajes y accesorios" detail="Selecciona los complementos del proyecto">
             <div className="options-grid">
               <CheckRow label="Bisagras cierre suave" checked={selected.hinges} price="S/ 48.00" onChange={() => toggle('hinges')} />
               <CheckRow label="Correderas telescópicas" checked={selected.slides} price="S/ 96.00" onChange={() => toggle('slides')} />
@@ -547,7 +1026,7 @@ function Quoter({ customers, onAddCustomer }: { customers: Customer[]; onAddCust
               <CheckRow label="Iluminación LED" checked={selected.led} price="S/ 120.00" onChange={() => toggle('led')} />
             </div>
           </Section>
-          <Section number="06" icon={ClipboardList} title="Observaciones y referencia" detail="Agrega indicaciones o una imagen del ambiente">
+          <Section number="07" icon={ClipboardList} title="Observaciones y referencia" detail="Agrega indicaciones o una imagen del ambiente">
             <textarea rows={4} value={notes} onChange={e => setNotes(e.target.value)} />
             <label className="upload-box"><Upload size={18} /><b>Subir imagen o referencia</b><span>JPG, PNG o plano hasta 5 MB</span><input type="file" /></label>
           </Section>
