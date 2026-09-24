@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { categories, customers, formatMoney, products, projects, quotes, type Customer, type ProductCategory } from '@/data/mock'
 import { HiOutlineArrowTrendingUp, HiOutlineBanknotes, HiOutlineClipboardDocumentList, HiOutlineCube, HiOutlineCurrencyDollar, HiOutlinePercentBadge, HiOutlineReceiptPercent, HiOutlineShoppingBag } from 'react-icons/hi2'
+import { FurnitureMap } from '@/components/map'
 
 type Module = 'Cotizador' | 'Base de precios' | 'Clientes' | 'Proyectos' | 'Cotizaciones' | 'Configuración'
 const nav: { label: Module; icon: typeof Calculator }[] = [
@@ -560,7 +561,7 @@ function PdfTemplate({ client, material, dimensions, calc, notes, selected, meta
   dimensions: { width: string; height: string; depth: string; quantity: string };
   calc: { area: number; edge: number; direct: number; cost: number; beforeTax: number; igv: number; total: number; qty: number };
   notes: string;
-  selected?: { hinges: boolean; slides: boolean; handles: boolean; led: boolean; drawers: boolean; delivery: boolean; installation: boolean; survey: boolean; removal: boolean };
+  selected?: { hinges: boolean; slides: boolean; handles: boolean; led: boolean; drawers: boolean; legs?: boolean; rod?: boolean; shelves?: boolean; delivery: boolean; installation: boolean; survey: boolean; removal: boolean };
   meta: { number: string; date: string; validity: string; status: string; address: string; projectName: string; environment: string; furnitureType: string; advisor: string; leadDays: string; tapacanto: string; paymentTerms: string; guarantee: string; curSymbol?: string; curRate?: number };
   overrideTotal?: number | null;
 }) {
@@ -590,7 +591,10 @@ function PdfTemplate({ client, material, dimensions, calc, notes, selected, meta
     selected?.slides && 'Correderas telescópicas pesadas',
     selected?.handles && 'Tiradores estándar de perfil',
     selected?.drawers && 'Cajones interiores reforzados',
-    selected?.led && 'Iluminación LED cálida integrada'
+    selected?.led && 'Iluminación LED cálida integrada',
+    selected?.legs && 'Patas metálicas nivelables',
+    selected?.rod && 'Barra colgador interior',
+    selected?.shelves && 'Estantes interiores ajustables'
   ].filter(Boolean).join(', ') || 'Herrajes estándar';
 
   return (
@@ -835,12 +839,27 @@ function NewClientModal({ onClose, onSave }: { onClose: () => void; onSave: (f: 
   );
 }
 
+const AMBIENTE_PRESETS: Record<string, { furnitureType: string; width: string; height: string; depth: string }> = {
+  Cocina: { furnitureType: 'Mueble bajo', width: '240', height: '90', depth: '60' },
+  Dormitorio: { furnitureType: 'Clóset', width: '300', height: '240', depth: '60' },
+  Sala: { furnitureType: 'Rack TV', width: '160', height: '45', depth: '35' },
+  Oficina: { furnitureType: 'Escritorio', width: '140', height: '75', depth: '60' },
+  Baño: { furnitureType: 'Mueble bajo', width: '80', height: '60', depth: '50' },
+  Comedor: { furnitureType: 'Vitrina', width: '140', height: '190', depth: '40' },
+}
+
 function Quoter({ customers, onAddCustomer }: { customers: Customer[]; onAddCustomer: (c: Customer) => void }) {
-  const [client, setClient] = useState(customers[0]); const [step, setStep] = useState(0); const [margin, setMargin] = useState('35'); const [waste, setWaste] = useState('8'); const [dimensions, setDimensions] = useState({ width: '240', height: '90', depth: '60', quantity: '1' }); const [material, setMaterial] = useState(products[0]); const [tapacanto, setTapacanto] = useState(tapacantos[0]); const [selected, setSelected] = useState({ hinges: true, slides: false, handles: true, led: false, drawers: true, delivery: true, installation: true, survey: false, removal: false }); const [notes, setNotes] = useState('Considerar tomacorrientes existentes en muro posterior.'); const [quote, setQuote] = useState({ number: 'COT-2024-001', date: new Intl.DateTimeFormat('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date()), validity: '15 días', status: 'Borrador', address: 'Av. Caminos del Inca 345, Santiago de Surco', projectName: 'Fabricación de Muebles a Medida', environment: 'Cocina', furnitureType: 'Mueble bajo', advisor: 'Ana Torres (surco@modiru.pe)', leadDays: '15', paymentTerms: '50% adelanto · 50% contra entrega', guarantee: '12 meses' }); const [saved, setSaved] = useState(false); const [generatingPdf, setGeneratingPdf] = useState(false); const [customTotal, setCustomTotal] = useState(''); const [currency, setCurrency] = useState<Currency>(currencies[0]); const [leadQty, setLeadQty] = useState('15'); const [leadUnit, setLeadUnit] = useState<LeadUnit>('día'); const [showClientModal, setShowClientModal] = useState(false)
+  const [client, setClient] = useState(customers[0]); const [step, setStep] = useState(0); const [margin, setMargin] = useState('35'); const [waste, setWaste] = useState('8'); const [dimensions, setDimensions] = useState({ width: '240', height: '90', depth: '60', quantity: '1' }); const [material, setMaterial] = useState(products[0]); const [tapacanto, setTapacanto] = useState(tapacantos[0]); const [selected, setSelected] = useState({ hinges: true, slides: false, handles: true, led: false, drawers: true, legs: false, rod: false, shelves: false, delivery: true, installation: true, survey: false, removal: false }); const [notes, setNotes] = useState('Considerar tomacorrientes existentes en muro posterior.'); const [quote, setQuote] = useState({ number: 'COT-2024-001', date: new Intl.DateTimeFormat('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date()), validity: '15 días', status: 'Borrador', address: 'Av. Caminos del Inca 345, Santiago de Surco', projectName: 'Fabricación de Muebles a Medida', environment: 'Cocina', furnitureType: 'Mueble bajo', advisor: 'Ana Torres (surco@modiru.pe)', leadDays: '15', paymentTerms: '50% adelanto · 50% contra entrega', guarantee: '12 meses' }); const [saved, setSaved] = useState(false); const [generatingPdf, setGeneratingPdf] = useState(false); const [customTotal, setCustomTotal] = useState(''); const [currency, setCurrency] = useState<Currency>(currencies[0]); const [leadQty, setLeadQty] = useState('15'); const [leadUnit, setLeadUnit] = useState<LeadUnit>('día'); const [showClientModal, setShowClientModal] = useState(false)
   const leadText = `${leadQty} ${moneyInput(leadQty) === 1 ? leadUnit : leadPlural[leadUnit]}`;
   const volume = (moneyInput(dimensions.width) * moneyInput(dimensions.height) * moneyInput(dimensions.depth)) / 1000000;
   const setQuoteField = (key: keyof typeof quote, value: string) => setQuote(q => ({ ...q, [key]: value }));
-  const calc = useMemo(() => { const w = moneyInput(dimensions.width) / 100; const h = moneyInput(dimensions.height) / 100; const d = moneyInput(dimensions.depth) / 100; const qty = Math.max(1, moneyInput(dimensions.quantity)); const area = (w * d * 2 + w * h * 2 + d * h * 2) * qty; const edge = (w * 2 + h * 2 + d * 2) * qty; const direct = area * material.price + edge * tapacanto.price + (selected.hinges ? 48 : 0) + (selected.slides ? 96 : 0) + (selected.handles ? 54 : 0) + (selected.led ? 120 : 0) + (selected.drawers ? 170 : 0) + (selected.delivery ? 80 : 0) + (selected.installation ? 220 : 0) + (selected.survey ? 60 : 0) + (selected.removal ? 120 : 0); const cost = direct * (1 + moneyInput(waste) / 100); const beforeTax = cost / Math.max(.1, 1 - moneyInput(margin) / 100); const igv = beforeTax * .18; return { area, edge, direct, cost, beforeTax, igv, total: beforeTax + igv, qty } }, [dimensions, material, tapacanto, selected, margin, waste])
+  const chooseEnvironment = (value: string) => {
+    const p = AMBIENTE_PRESETS[value]
+    if (!p) return
+    setQuote(q => ({ ...q, environment: value, furnitureType: p.furnitureType }))
+    setDimensions(d => ({ ...d, width: p.width, height: p.height, depth: p.depth }))
+  };
+  const calc = useMemo(() => { const w = moneyInput(dimensions.width) / 100; const h = moneyInput(dimensions.height) / 100; const d = moneyInput(dimensions.depth) / 100; const qty = Math.max(1, moneyInput(dimensions.quantity)); const area = (w * d * 2 + w * h * 2 + d * h * 2) * qty; const edge = (w * 2 + h * 2 + d * 2) * qty; const direct = area * material.price + edge * tapacanto.price + (selected.hinges ? 48 : 0) + (selected.slides ? 96 : 0) + (selected.handles ? 54 : 0) + (selected.led ? 120 : 0) + (selected.drawers ? 170 : 0) + (selected.legs ? 60 : 0) + (selected.rod ? 45 : 0) + (selected.shelves ? 90 : 0) + (selected.delivery ? 80 : 0) + (selected.installation ? 220 : 0) + (selected.survey ? 60 : 0) + (selected.removal ? 120 : 0); const cost = direct * (1 + moneyInput(waste) / 100); const beforeTax = cost / Math.max(.1, 1 - moneyInput(margin) / 100); const igv = beforeTax * .18; return { area, edge, direct, cost, beforeTax, igv, total: beforeTax + igv, qty } }, [dimensions, material, tapacanto, selected, margin, waste])
   const toggle = (key: keyof typeof selected) => setSelected(s => ({ ...s, [key]: !s[key] })); const updateDim = (key: keyof typeof dimensions, value: string) => setDimensions(d => ({ ...d, [key]: value }));
   const priceTotal = customTotal ? moneyInput(customTotal) : calc.total;
   const igvShown = customTotal ? Math.max(0, priceTotal - calc.beforeTax) : calc.igv;
@@ -871,7 +890,7 @@ function Quoter({ customers, onAddCustomer }: { customers: Customer[]; onAddCust
         'display:flex', 'flex-direction:column', 'justify-content:flex-start',
         `width:${A4_PX}px`, 'min-height:1123px', 'padding:20px',
         'box-sizing:border-box', 'background:#fff', 'margin:0',
-        'overflow:visible', 'font-family:Arial,Helvetica,sans-serif', 'font-size:11px',
+        'overflow:visible', 'font-family:Inter, Arial, Helvetica, sans-serif', 'font-size:11px',
       ].join(';');
       container.appendChild(clone);
       document.body.appendChild(container);
@@ -990,8 +1009,8 @@ function Quoter({ customers, onAddCustomer }: { customers: Customer[]; onAddCust
           <div className="wiz-step" data-step="2">
             <Section number="03" id="quote-sec-producto" icon={Box} title="Ambiente, mueble y dimensiones" detail="Las medidas se expresan en centímetros">
               <div className="form-grid three">
-                <Field label="Ambiente"><Select value={quote.environment} onChange={e => setQuoteField('environment', e.target.value)}><option>Cocina</option><option>Dormitorio</option><option>Sala</option><option>Oficina</option><option>Baño</option></Select></Field>
-                <Field label="Tipo de mueble"><Select value={quote.furnitureType} onChange={e => setQuoteField('furnitureType', e.target.value)}><option>Mueble bajo</option><option>Mueble alto</option><option>Clóset</option><option>Rack TV</option><option>Personalizado</option></Select></Field>
+                <Field label="Ambiente"><Select value={quote.environment} onChange={e => chooseEnvironment(e.target.value)}><option>Cocina</option><option>Dormitorio</option><option>Sala</option><option>Oficina</option><option>Baño</option><option>Comedor</option></Select></Field>
+                <Field label="Tipo de mueble"><Select value={quote.furnitureType} onChange={e => setQuoteField('furnitureType', e.target.value)}><option>Mueble bajo</option><option>Mueble alto</option><option>Clóset</option><option>Rack TV</option><option>Estantería</option><option>Escritorio</option><option>Zapatero</option><option>Vitrina</option><option>Isla de cocina</option><option>Personalizado</option></Select></Field>
                 <Field label="Cantidad"><input type="number" value={dimensions.quantity} onChange={e => updateDim('quantity', e.target.value)} min="1" /></Field>
               </div>
               <div className="form-grid three">
@@ -999,6 +1018,7 @@ function Quoter({ customers, onAddCustomer }: { customers: Customer[]; onAddCust
                 <Field label="Alto (cm)"><input type="number" value={dimensions.height} onChange={e => updateDim('height', e.target.value)} /></Field>
                 <Field label="Profundidad (cm)"><input type="number" value={dimensions.depth} onChange={e => updateDim('depth', e.target.value)} /></Field>
               </div>
+              <p className="form-note"><Sparkles size={12} /> Al elegir un <b>ambiente</b> se sugieren el tipo de mueble y las medidas; puedes ajustarlos libremente después.</p>
               <div className="calc-panel">
                 <div className="calc-item">
                   <span className="calc-ico area"><Ruler size={16} /></span>
@@ -1032,11 +1052,17 @@ function Quoter({ customers, onAddCustomer }: { customers: Customer[]; onAddCust
                 <CheckRow label="Tiradores estándar" checked={selected.handles} price="S/ 54.00" onChange={() => toggle('handles')} />
                 <CheckRow label="Cajones interiores" checked={selected.drawers} price="S/ 170.00" onChange={() => toggle('drawers')} />
                 <CheckRow label="Iluminación LED" checked={selected.led} price="S/ 120.00" onChange={() => toggle('led')} />
+                <CheckRow label="Patas metálicas" checked={selected.legs} price="S/ 60.00" onChange={() => toggle('legs')} />
+                <CheckRow label="Barra colgador interior" checked={selected.rod} price="S/ 45.00" onChange={() => toggle('rod')} />
+                <CheckRow label="Estantes interiores" checked={selected.shelves} price="S/ 90.00" onChange={() => toggle('shelves')} />
               </div>
             </Section>
             <Section number="06" icon={ClipboardList} title="Observaciones y referencia" detail="Agrega indicaciones o una imagen del ambiente">
               <textarea rows={4} value={notes} onChange={e => setNotes(e.target.value)} />
               <label className="upload-box"><Upload size={18} /><b>Subir imagen o referencia</b><span>JPG, PNG o plano hasta 5 MB</span><input type="file" /></label>
+            </Section>
+            <Section number="07" icon={Cuboid} title="Mapa 2D / 3D del producto" detail="Vista técnica que se construye según el tipo de mueble y los accesorios seleccionados">
+              <FurnitureMap type={quote.furnitureType} dimensions={dimensions} material={material} selected={{ drawers: selected.drawers, handles: selected.handles, led: selected.led, hinges: selected.hinges, legs: selected.legs, rod: selected.rod, shelves: selected.shelves }} />
             </Section>
           </div>
         </div>

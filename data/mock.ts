@@ -9,7 +9,7 @@ export type Project = { id: string; name: string; customer: string; environment:
 export const products: Product[] = [
   { id: 'MAT-001', category: 'Melaminas', name: 'Roble Natural 18 mm', brand: 'Masisa', model: 'Nature', detail: 'Texturado · 18 mm', unit: 'm²', price: 85, status: 'Activo', updated: '18 jun 2024', swatch: '#c9a27a' },
   { id: 'MAT-002', category: 'Melaminas', name: 'Blanco Nevado 18 mm', brand: 'Pelikano', model: 'Essential', detail: 'Mate · 18 mm', unit: 'm²', price: 72, status: 'Activo', updated: '17 jun 2024', swatch: '#f4f3f0' },
-  { id: 'MAT-003', category: 'Melaminas', name: 'Nogal Siena 18 mm', brand: 'Arauco', model: 'Design', detail: 'Veteado · 18 mm', unit: 'm²', price: 98, status: 'Activo', updated: '12 jun 2024', swatch: '#6b4a33' },
+  { id: 'MAT-003', category: 'Melaminas', name: 'Nogal Siena 18 mm', brand: 'Arauco', model: 'Design', detail: 'Veteado · 18 mm', unit: 'm²', price: 98, status: 'Activo', updated: '12 jun 2024', swatch: '/textures/nogal.svg' },
   { id: 'EDG-001', category: 'Tapacantos', name: 'PVC Blanco 1 mm', brand: 'Rehau', model: 'Estándar', detail: 'Blanco · 1 mm', unit: 'ml', price: 7.5, status: 'Activo', updated: '18 jun 2024' },
   { id: 'EDG-002', category: 'Tapacantos', name: 'PVC Roble 2 mm', brand: 'Rehau', model: 'Nature', detail: 'Roble · 2 mm', unit: 'ml', price: 11, status: 'Activo', updated: '14 jun 2024' },
   { id: 'HAR-001', category: 'Herrajes', name: 'Bisagra cierre suave', brand: 'Blum', model: 'Clip top', detail: '110° · overlay', unit: 'und', price: 12, status: 'Activo', updated: '18 jun 2024' },
