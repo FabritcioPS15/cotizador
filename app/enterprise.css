@@ -1,0 +1,491 @@
+/* ═══════════════════════════════════════════════════
+   MODIRU Enterprise Theme
+   Premium, corporate styling overlay
+   ═══════════════════════════════════════════════════ */
+
+/* ── Tokens ── */
+:root {
+  --background: #f0f4f8;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --primary: #0f172a;
+  --primary-foreground: #ffffff;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --border: #e2e8f0;
+  --input: #ffffff;
+  --ring: #3b82f6;
+}
+
+/* ── Body ── */
+body {
+  background: linear-gradient(160deg, #f0f4f8 0%, #dfe6ed 100%) !important;
+  background-attachment: fixed !important;
+}
+
+.admin-shell {
+  background: transparent !important;
+}
+
+/* ══════════════════════════════════════════════
+   SIDEBAR — dark for logo contrast
+   ══════════════════════════════════════════════ */
+.sidebar {
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 4px 0 30px rgba(0, 0, 0, 0.15) !important;
+}
+
+.sidebar .sidebar-brand,
+.sidebar .sidebar-label,
+.sidebar .sidebar-footer,
+.sidebar .sidebar-footer b,
+.sidebar .sidebar-footer span,
+.sidebar .sidebar-close,
+.sidebar .nav-item,
+.sidebar .nav-item span,
+.sidebar .nav-item em,
+.sidebar .nav-item svg {
+  color: rgba(241, 245, 249, 0.85) !important;
+}
+
+.sidebar .nav-item.active,
+.sidebar .nav-item.active span,
+.sidebar .nav-item.active svg {
+  color: #ffffff !important;
+}
+
+.sidebar .nav-item:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+.sidebar .avatar {
+  background: rgba(59, 130, 246, 0.2) !important;
+  color: #93c5fd !important;
+}
+
+/* ══════════════════════════════════════════════
+   HEADER — glass effect, search visible
+   ══════════════════════════════════════════════ */
+.admin-header, .topbar {
+  background: rgba(255, 255, 255, 0.82) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.6) !important;
+  box-shadow: 0 1px 12px rgba(15, 23, 42, 0.04) !important;
+}
+
+/* Search bar — explicit colors so it's always visible */
+.global-search {
+  background: rgba(241, 245, 249, 0.9) !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 10px !important;
+  transition: all 0.25s ease !important;
+}
+
+.global-search:focus-within {
+  border-color: #94a3b8 !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+.global-search input {
+  color: #0f172a !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.global-search input::placeholder {
+  color: #94a3b8 !important;
+}
+
+.global-search svg {
+  color: #64748b !important;
+}
+
+/* Search results dropdown */
+.search-results {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14) !important;
+}
+
+.search-result {
+  border-radius: 8px !important;
+}
+
+.search-result:hover {
+  background: #f1f5f9 !important;
+}
+
+.search-result b {
+  color: #0f172a !important;
+}
+
+.search-result span {
+  color: #64748b !important;
+}
+
+/* Header user & breadcrumbs — explicit colors */
+.breadcrumbs, .breadcrumbs span, .breadcrumbs b, .breadcrumbs i {
+  color: #334155 !important;
+}
+
+.header-user span {
+  color: #334155 !important;
+}
+
+.icon-button {
+  color: #475569 !important;
+}
+
+/* ══════════════════════════════════════════════
+   CARDS & PANELS — glass morphism
+   ══════════════════════════════════════════════ */
+.app-card, .quote-section, .panel {
+  background: rgba(255, 255, 255, 0.88) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(226, 232, 240, 0.7) !important;
+  box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.06), 0 2px 6px -2px rgba(15, 23, 42, 0.03) !important;
+  border-radius: 14px !important;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease !important;
+}
+
+.app-card:hover, .quote-section:hover, .panel:hover {
+  border-color: rgba(203, 213, 225, 0.9) !important;
+  box-shadow: 0 8px 28px -6px rgba(15, 23, 42, 0.1), 0 4px 10px -4px rgba(15, 23, 42, 0.04) !important;
+}
+
+/* ══════════════════════════════════════════════
+   PRICE SUMMARY — fix spacing and make it pop
+   ══════════════════════════════════════════════ */
+.price-card {
+  padding: 20px !important;
+}
+
+.price-card .side-kicker {
+  color: #1d4ed8 !important;
+  font-size: 10px !important;
+  letter-spacing: 0.1em !important;
+}
+
+.price-card h2 {
+  font-size: 18px !important;
+  margin: 10px 0 4px !important;
+  color: #0f172a !important;
+}
+
+.price-card > p {
+  color: #64748b !important;
+  font-size: 11px !important;
+}
+
+.price-total-edit {
+  margin-top: 16px !important;
+  gap: 10px !important;
+}
+
+.price-total-edit input {
+  border-radius: 10px !important;
+  border: 2px solid #e2e8f0 !important;
+  background: #f8fafc !important;
+  padding: 10px 12px !important;
+  font-size: 24px !important;
+  color: #0f766e !important;
+}
+
+.price-total-edit input:focus {
+  border-color: #0f766e !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12) !important;
+}
+
+.price-money-icon {
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 10px !important;
+  background: #f0fdf4 !important;
+  color: #0f766e !important;
+}
+
+.currency-row {
+  margin-top: 12px !important;
+  padding: 10px 12px !important;
+  border-radius: 10px !important;
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.currency-row > span {
+  color: #475569 !important;
+  font-size: 11px !important;
+}
+
+/* Margin slider */
+.margin-control {
+  margin-top: 14px !important;
+  padding: 12px !important;
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 10px !important;
+}
+
+.range-line {
+  margin-bottom: 8px !important;
+}
+
+.range-line span {
+  color: #475569 !important;
+}
+
+.val-pop {
+  color: #0f766e !important;
+}
+
+/* Split bar */
+.split-bar {
+  margin-top: 14px !important;
+  border-radius: 6px !important;
+  overflow: hidden !important;
+}
+
+.split-legend {
+  margin-top: 8px !important;
+}
+
+.split-legend div {
+  padding: 6px 0 !important;
+}
+
+/* Summary lines */
+.summary-lines {
+  margin-top: 14px !important;
+  padding-top: 10px !important;
+  border-top: 1px solid #e2e8f0 !important;
+}
+
+.summary-lines > div {
+  padding: 8px 0 !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+.summary-lines > div:last-child {
+  border-bottom: none !important;
+}
+
+.summary-lines .line-strong {
+  border-top: 2px solid #e2e8f0 !important;
+  padding-top: 10px !important;
+  margin-top: 4px !important;
+}
+
+.summary-lines b {
+  color: #0f172a !important;
+}
+
+/* Buttons in price card */
+.full-button {
+  border-radius: 10px !important;
+  margin-top: 8px !important;
+  padding: 10px 16px !important;
+}
+
+/* Profit card */
+.profit-side {
+  padding: 14px 16px !important;
+}
+
+.profit-badge {
+  border-radius: 10px !important;
+  background: #dbeafe !important;
+  color: #1d4ed8 !important;
+}
+
+/* Side checklist & terms */
+.side-checklist {
+  padding: 4px 0 !important;
+}
+
+.terms-list {
+  padding: 4px 0 !important;
+}
+
+/* ══════════════════════════════════════════════
+   BUTTONS — polished, enterprise feel
+   ══════════════════════════════════════════════ */
+.app-button, .button {
+  border-radius: 10px !important;
+  transition: all 0.2s ease !important;
+  font-weight: 600 !important;
+}
+
+.app-button-primary, .button.primary {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.18) !important;
+}
+
+.app-button-primary:hover, .button.primary:hover {
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25) !important;
+}
+
+.app-button:hover:not(.app-button-primary), .button:hover:not(.primary) {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* ══════════════════════════════════════════════
+   TABLES — clean enterprise look
+   ══════════════════════════════════════════════ */
+.table-scroll {
+  border-radius: 12px !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03) !important;
+}
+
+table th {
+  background: #f8fafc !important;
+  color: #475569 !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  font-size: 10px !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+table tr {
+  transition: background 0.15s ease !important;
+}
+
+table tr:hover {
+  background: #f8fafc !important;
+}
+
+/* ══════════════════════════════════════════════
+   STATUS BADGES — pill shape
+   ══════════════════════════════════════════════ */
+.status {
+  border-radius: 20px !important;
+  padding: 4px 12px !important;
+  font-weight: 700 !important;
+  font-size: 10px !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* ══════════════════════════════════════════════
+   INPUTS & SELECTS — refined
+   ══════════════════════════════════════════════ */
+input, select, textarea {
+  border-radius: 8px !important;
+  border: 1px solid #e2e8f0 !important;
+  background: #ffffff !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #94a3b8 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12) !important;
+  outline: none !important;
+}
+
+/* Range input — don't break it */
+input[type="range"] {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+input[type="range"]:focus {
+  box-shadow: none !important;
+}
+
+/* Checkbox — don't break it */
+input[type="checkbox"] {
+  border-radius: 4px !important;
+}
+
+/* ══════════════════════════════════════════════
+   STEPPER — refined look
+   ══════════════════════════════════════════════ */
+.quote-stepper {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(226, 232, 240, 0.7) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04) !important;
+}
+
+.stepper-dot {
+  border-radius: 50% !important;
+}
+
+/* ══════════════════════════════════════════════
+   QUOTE LAYOUT — ensure proper fit
+   ══════════════════════════════════════════════ */
+.quote-layout {
+  gap: 20px !important;
+}
+
+.quote-main {
+  gap: 18px !important;
+}
+
+.quote-side {
+  gap: 16px !important;
+}
+
+/* ══════════════════════════════════════════════
+   PDF — premium styling (only for screen view)
+   ══════════════════════════════════════════════ */
+.pdf-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12) !important;
+  padding: 22px !important;
+}
+
+.pdf-header,
+.pdf-header * {
+  color: white !important;
+}
+
+.pdf-block {
+  border-radius: 14px !important;
+  border: 1px solid #e2e8f0 !important;
+  background: white !important;
+  padding: 22px !important;
+}
+
+/* ══════════════════════════════════════════════
+   FOOTER — subtle
+   ══════════════════════════════════════════════ */
+.admin-footer {
+  background: transparent !important;
+  border-top: 1px solid #e2e8f0 !important;
+  color: #94a3b8 !important;
+}
+
+/* ══════════════════════════════════════════════
+   PRINT — don't apply enterprise styles
+   ══════════════════════════════════════════════ */
+@media print {
+  body {
+    background: white !important;
+  }
+
+  .app-card, .quote-section, .panel,
+  .admin-header, .topbar,
+  .quote-stepper,
+  .sidebar {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    background: white !important;
+  }
+}
